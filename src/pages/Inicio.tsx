@@ -20,6 +20,12 @@ export default function Inicio() {
       >
         Ver animales
       </Link>
+      <Link
+        to="/animales/nuevo"
+        className="bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2"
+      >
+        Nuevo animal
+      </Link>
       <button
         onClick={salir}
         className="bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2"
