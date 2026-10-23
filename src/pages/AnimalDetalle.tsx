@@ -1,5 +1,6 @@
+
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
 
 interface Animal {
@@ -21,9 +22,11 @@ interface Animal {
 
 export default function AnimalDetalle() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [animal, setAnimal] = useState<Animal | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [eliminando, setEliminando] = useState(false)
 
   useEffect(() => {
     setCargando(true)
@@ -40,6 +43,22 @@ export default function AnimalDetalle() {
       )
       .finally(() => setCargando(false))
   }, [id])
+
+  const eliminar = async () => {
+    if (!animal) return
+    if (!window.confirm(`¿Eliminar a ${animal.nombre} (${animal.codigo})? No se puede deshacer.`)) {
+      return
+    }
+    setEliminando(true)
+    setError('')
+    try {
+      await api.delete(`/animales/${id}`)
+      navigate('/animales')
+    } catch (err: any) {
+      setError(err.response?.data?.error?.message ?? 'No se pudo eliminar el animal')
+      setEliminando(false)
+    }
+  }
 
   const fecha = (f: string | null) =>
     f ? new Date(f).toLocaleDateString('es-CO') : '—'
@@ -98,6 +117,22 @@ export default function AnimalDetalle() {
             <Fila etiqueta="Padre" valor={enlaceAnimal(animal.padre_id)} />
             <Fila etiqueta="Lote" valor={animal.lotes_animales?.nombre ?? '—'} />
             <Fila etiqueta="Potrero" valor={animal.potrero_id ?? '—'} />
+
+            <div className="flex gap-3 mt-6">
+              <Link
+                to={`/animales/${animal.id}/editar`}
+                className="flex-1 text-center bg-green-700 hover:bg-green-800 text-white rounded-lg py-2"
+              >
+                Editar
+              </Link>
+              <button
+                onClick={eliminar}
+                disabled={eliminando}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-lg py-2 disabled:opacity-50"
+              >
+                {eliminando ? 'Eliminando...' : 'Eliminar'}
+              </button>
+            </div>
           </div>
         )}
       </div>
