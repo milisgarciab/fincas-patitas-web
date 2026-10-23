@@ -32,7 +32,6 @@ export default function Animales() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
-  // Espera 400 ms después de escribir antes de buscar
   useEffect(() => {
     const t = setTimeout(() => {
       setBusqueda(texto)
@@ -107,9 +106,17 @@ export default function Animales() {
                 </tr>
               ) : (
                 animales.map((a) => (
-                  <tr key={a.id} className="border-t border-gray-100">
-                    <td className="px-4 py-2 font-mono text-sm">{a.codigo}</td>
-                    <td className="px-4 py-2">{a.nombre}</td>
+                  <tr key={a.id} className="border-t border-gray-100 hover:bg-green-50">
+                    <td className="px-4 py-2 font-mono text-sm">
+                      <Link to={`/animales/${a.id}`} className="text-green-700 hover:underline">
+                        {a.codigo}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2">
+                      <Link to={`/animales/${a.id}`} className="hover:underline">
+                        {a.nombre}
+                      </Link>
+                    </td>
                     <td className="px-4 py-2">{a.especies?.nombre}</td>
                     <td className="px-4 py-2">{a.razas?.nombre}</td>
                     <td className="px-4 py-2">{a.genero}</td>
