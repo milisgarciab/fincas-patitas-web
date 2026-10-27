@@ -41,6 +41,7 @@ export default function Reproduccion() {
   const [cerrando, setCerrando] = useState<Seguimiento | null>(null)
   const [resultado, setResultado] = useState('Parida')
   const [fechaParto, setFechaParto] = useState(new Date().toISOString().slice(0, 10))
+  const [notasCierre, setNotasCierre] = useState('')
 
   const cargar = () => {
     setError('')
@@ -72,6 +73,7 @@ export default function Reproduccion() {
 
   const abrirCierre = (s: Seguimiento) => {
     setCerrando(s)
+    setNotasCierre('')
     // Desde Pendiente solo se puede cerrar como Fallida
     setResultado(s.estado === 'Pendiente' ? 'Fallida' : 'Parida')
   }
@@ -82,8 +84,9 @@ export default function Reproduccion() {
     setTrabajando(cerrando.id)
     try {
       await api.patch(`/reproduccion/${cerrando.id}/cerrar`, {
-        estado: resultado,
+        resultado,
         fecha_real_parto: resultado === 'Fallida' ? undefined : fechaParto,
+        notas: notasCierre || undefined,
       })
       setCerrando(null)
       await cargar()
@@ -276,6 +279,16 @@ export default function Reproduccion() {
                 />
               </div>
             )}
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Notas (opcional)</label>
+              <textarea
+                value={notasCierre}
+                onChange={(e) => setNotasCierre(e.target.value)}
+                rows={2}
+                className={campo}
+              />
+            </div>
 
             <div className="flex gap-3">
               <button
