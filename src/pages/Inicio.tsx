@@ -45,7 +45,10 @@ export default function Inicio() {
         Reproducción
       </Link>
       <Link to="/finanzas" className={boton}>
-        Finanzas
+        Gastos y ventas
+      </Link>
+      <Link to="/finanzas/balance" className={boton}>
+        Precios y balance
       </Link>
       <button onClick={salir} className={boton}>
         Cerrar sesión
