@@ -15,6 +15,7 @@ import EventosSanitarios from './pages/EventosSanitarios'
 import CrearEventoSanitario from './pages/CrearEventoSanitario'
 import Reproduccion from './pages/Reproduccion'
 import CrearReproduccion from './pages/CrearReproduccion'
+import Finanzas from './pages/Finanzas'
 
 function Protegida({ children }: { children: React.ReactNode }) {
   return localStorage.getItem('accessToken') ? children : <Navigate to="/" />
@@ -143,6 +144,14 @@ export default function App() {
           element={
             <Protegida>
               <CrearReproduccion />
+            </Protegida>
+          }
+        />
+        <Route
+          path="/finanzas"
+          element={
+            <Protegida>
+              <Finanzas />
             </Protegida>
           }
         />
