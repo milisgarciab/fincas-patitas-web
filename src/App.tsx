@@ -6,6 +6,9 @@ import Animales from './pages/Animales'
 import AnimalDetalle from './pages/AnimalDetalle'
 import CrearAnimal from './pages/CrearAnimal'
 import EditarAnimal from './pages/EditarAnimal'
+import ProduccionLeche from './pages/ProduccionLeche'
+import ProduccionHuevos from './pages/ProduccionHuevos'
+import RegistrarProduccion from './pages/RegistrarProduccion'
 
 function Protegida({ children }: { children: React.ReactNode }) {
   return localStorage.getItem('accessToken') ? children : <Navigate to="/" />
@@ -54,6 +57,38 @@ export default function App() {
           element={
             <Protegida>
               <AnimalDetalle />
+            </Protegida>
+          }
+        />
+        <Route
+          path="/produccion/leche"
+          element={
+            <Protegida>
+              <ProduccionLeche />
+            </Protegida>
+          }
+        />
+        <Route
+          path="/produccion/leche/nuevo"
+          element={
+            <Protegida>
+              <RegistrarProduccion tipo="leche" />
+            </Protegida>
+          }
+        />
+        <Route
+          path="/produccion/huevos"
+          element={
+            <Protegida>
+              <ProduccionHuevos />
+            </Protegida>
+          }
+        />
+        <Route
+          path="/produccion/huevos/nuevo"
+          element={
+            <Protegida>
+              <RegistrarProduccion tipo="huevos" />
             </Protegida>
           }
         />
