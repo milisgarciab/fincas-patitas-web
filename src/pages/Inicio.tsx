@@ -44,6 +44,9 @@ export default function Inicio() {
       <Link to="/reproduccion" className={boton}>
         Reproducción
       </Link>
+      <Link to="/finanzas" className={boton}>
+        Finanzas
+      </Link>
       <button onClick={salir} className={boton}>
         Cerrar sesión
       </button>
