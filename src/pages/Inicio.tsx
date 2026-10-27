@@ -38,6 +38,9 @@ export default function Inicio() {
       <Link to="/bodega" className={boton}>
         Inventario
       </Link>
+      <Link to="/salud" className={boton}>
+        Salud animal
+      </Link>
       <button onClick={salir} className={boton}>
         Cerrar sesión
       </button>
