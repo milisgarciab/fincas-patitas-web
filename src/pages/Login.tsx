@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { api } from '../api'
+import AuthLayout from '../components/AuthLayout'
 
 export default function Login() {
   const [correo, setCorreo] = useState('')
@@ -9,6 +10,8 @@ export default function Login() {
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  const registrado = location.state?.registrado
 
   const entrar = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,15 +37,24 @@ export default function Login() {
     }
   }
 
+  const campo =
+    'w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600'
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-green-50">
+    <AuthLayout>
       <form
         onSubmit={entrar}
         className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm space-y-4"
       >
         <h1 className="text-2xl font-bold text-green-800 text-center">
-          Fincas y Patitas
+          Iniciar sesión
         </h1>
+
+        {registrado && (
+          <p className="text-green-700 text-sm text-center">
+            Cuenta creada. Ya puedes iniciar sesión.
+          </p>
+        )}
 
         <input
           type="email"
@@ -50,7 +62,7 @@ export default function Login() {
           value={correo}
           onChange={(e) => setCorreo(e.target.value)}
           required
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+          className={campo}
         />
 
         <input
@@ -59,7 +71,7 @@ export default function Login() {
           value={contrasena}
           onChange={(e) => setContrasena(e.target.value)}
           required
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+          className={campo}
         />
 
         {error && <p className="text-red-600 text-sm">{error}</p>}
@@ -71,7 +83,14 @@ export default function Login() {
         >
           {cargando ? 'Entrando...' : 'Iniciar sesión'}
         </button>
+
+        <p className="text-sm text-center text-gray-600">
+          ¿No tienes cuenta?{' '}
+          <Link to="/registro" className="text-green-700 hover:underline">
+            Regístrate
+          </Link>
+        </p>
       </form>
-    </div>
+    </AuthLayout>
   )
 }

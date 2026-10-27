@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
+import Registro from './pages/Registro'
 import Inicio from './pages/Inicio'
 import Animales from './pages/Animales'
 import AnimalDetalle from './pages/AnimalDetalle'
 import CrearAnimal from './pages/CrearAnimal'
+import EditarAnimal from './pages/EditarAnimal'
 
 function Protegida({ children }: { children: React.ReactNode }) {
   return localStorage.getItem('accessToken') ? children : <Navigate to="/" />
@@ -14,6 +16,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
         <Route
           path="/inicio"
           element={
@@ -35,6 +38,14 @@ export default function App() {
           element={
             <Protegida>
               <CrearAnimal />
+            </Protegida>
+          }
+        />
+        <Route
+          path="/animales/:id/editar"
+          element={
+            <Protegida>
+              <EditarAnimal />
             </Protegida>
           }
         />
