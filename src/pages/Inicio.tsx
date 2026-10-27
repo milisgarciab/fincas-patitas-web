@@ -26,8 +26,14 @@ export default function Inicio() {
       <Link to="/produccion/leche" className={boton}>
         Producción de leche
       </Link>
+      <Link to="/produccion/leche/nuevo" className={boton}>
+        Registrar leche
+      </Link>
       <Link to="/produccion/huevos" className={boton}>
         Producción de huevos
+      </Link>
+      <Link to="/produccion/huevos/nuevo" className={boton}>
+        Registrar huevos
       </Link>
       <button onClick={salir} className={boton}>
         Cerrar sesión
