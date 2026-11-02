@@ -1,58 +1,38 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+
+const TARJETAS = [
+  { icono: '🐄', titulo: 'Animales', texto: 'Lista, detalle y edición de tu ganado.', ruta: '/animales' },
+  { icono: '🥛', titulo: 'Producción', texto: 'Leche y huevos en un solo lugar.', ruta: '/produccion' },
+  { icono: '📦', titulo: 'Inventario', texto: 'Insumos, categorías y stock bajo.', ruta: '/bodega' },
+  { icono: '💉', titulo: 'Salud animal', texto: 'Vacunas, tratamientos y seguimiento.', ruta: '/salud' },
+  { icono: '🐣', titulo: 'Reproducción', texto: 'Gestaciones: confirmar y cerrar.', ruta: '/reproduccion' },
+  { icono: '💰', titulo: 'Gastos y ventas', texto: 'Control de ingresos y egresos.', ruta: '/finanzas' },
+  { icono: '📊', titulo: 'Precios y balance', texto: 'Precios de mercado y balances.', ruta: '/finanzas/balance' },
+]
 
 export default function Inicio() {
-  const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('user') ?? '{}')
 
-  const salir = () => {
-    localStorage.clear()
-    navigate('/')
-  }
-
-  const boton =
-    'bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2'
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-green-50">
-      <h1 className="text-2xl font-bold text-green-800">
+    <div className="max-w-6xl mx-auto p-6">
+      <h1 className="text-3xl font-bold text-green-800">
         Bienvenida, {user.nombre_usuario}
       </h1>
-      <Link to="/animales" className={boton}>
-        Ver animales
-      </Link>
-      <Link to="/animales/nuevo" className={boton}>
-        Nuevo animal
-      </Link>
-      <Link to="/produccion/leche" className={boton}>
-        Producción de leche
-      </Link>
-      <Link to="/produccion/leche/nuevo" className={boton}>
-        Registrar leche
-      </Link>
-      <Link to="/produccion/huevos" className={boton}>
-        Producción de huevos
-      </Link>
-      <Link to="/produccion/huevos/nuevo" className={boton}>
-        Registrar huevos
-      </Link>
-      <Link to="/bodega" className={boton}>
-        Inventario
-      </Link>
-      <Link to="/salud" className={boton}>
-        Salud animal
-      </Link>
-      <Link to="/reproduccion" className={boton}>
-        Reproducción
-      </Link>
-      <Link to="/finanzas" className={boton}>
-        Gastos y ventas
-      </Link>
-      <Link to="/finanzas/balance" className={boton}>
-        Precios y balance
-      </Link>
-      <button onClick={salir} className={boton}>
-        Cerrar sesión
-      </button>
+      <p className="text-gray-600 mt-1 mb-6">¿Qué quieres hacer hoy en la finca?</p>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {TARJETAS.map((t) => (
+          <Link
+            key={t.ruta}
+            to={t.ruta}
+            className="bg-white rounded-xl shadow p-5 hover:shadow-md hover:-translate-y-0.5 transition"
+          >
+            <div className="text-4xl mb-3">{t.icono}</div>
+            <h2 className="text-lg font-semibold text-green-800">{t.titulo}</h2>
+            <p className="text-sm text-gray-600 mt-1">{t.texto}</p>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }

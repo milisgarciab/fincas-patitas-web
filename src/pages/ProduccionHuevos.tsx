@@ -15,14 +15,8 @@ interface RegistroHuevos {
   creado_por: { nombre_usuario: string } | null
 }
 
-// Rutas posibles del backend: se prueban en este orden
-const RUTAS_HUEVOS = [
-  '/production/huevos',
-  '/production/eggs',
-  '/produccion/huevos',
-  '/production/produccion-huevos',
-  '/huevos',
-]
+// Ruta real del backend (confirmada en Swagger)
+const RUTAS_HUEVOS = ['/produccion-huevos', '/produccion/huevos']
 
 export default function ProduccionHuevos() {
   const [registros, setRegistros] = useState<RegistroHuevos[]>([])
@@ -35,7 +29,7 @@ export default function ProduccionHuevos() {
       .catch((err) =>
         setError(
           err.message === 'RUTA_NO_ENCONTRADA'
-            ? `No se encontró la ruta de huevos en el backend. Probé: ${RUTAS_HUEVOS.join(', ')}`
+            ? 'No se encontró la ruta de huevos en el backend'
             : 'No se pudo cargar la producción de huevos',
         ),
       )
@@ -60,8 +54,11 @@ export default function ProduccionHuevos() {
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-green-800">Producción de huevos</h1>
-          <Link to="/inicio" className="text-green-700 hover:underline">
-            ← Inicio
+          <Link
+            to="/produccion/huevos/nuevo"
+            className="bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2"
+          >
+            Registrar huevos
           </Link>
         </div>
 
@@ -114,7 +111,7 @@ export default function ProduccionHuevos() {
                       {r.animales ? (
                         <Link
                           to={`/animales/${r.animales.id}`}
-                          className="text-green-700 hover:underline"
+                          className="text-cafe hover:underline"
                         >
                           {origen(r)}
                         </Link>

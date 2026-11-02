@@ -14,15 +14,8 @@ interface RegistroLeche {
   creado_por: { nombre_usuario: string } | null
 }
 
-// Rutas posibles del backend: se prueban en este orden
-const RUTAS_LECHE = [
-  '/production/leche',
-  '/production/milk',
-  '/produccion/leche',
-  '/production/leches',
-  '/production/produccion-leche',
-  '/leche',
-]
+// Ruta real del backend (confirmada en Swagger)
+const RUTAS_LECHE = ['/produccion-leche']
 
 export default function ProduccionLeche() {
   const [registros, setRegistros] = useState<RegistroLeche[]>([])
@@ -35,7 +28,7 @@ export default function ProduccionLeche() {
       .catch((err) =>
         setError(
           err.message === 'RUTA_NO_ENCONTRADA'
-            ? `No se encontró la ruta de leche en el backend. Probé: ${RUTAS_LECHE.join(', ')}`
+            ? 'No se encontró la ruta de leche en el backend'
             : 'No se pudo cargar la producción de leche',
         ),
       )
@@ -59,8 +52,11 @@ export default function ProduccionLeche() {
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-green-800">Producción de leche</h1>
-          <Link to="/inicio" className="text-green-700 hover:underline">
-            ← Inicio
+          <Link
+            to="/produccion/leche/nuevo"
+            className="bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2"
+          >
+            Registrar leche
           </Link>
         </div>
 
@@ -106,7 +102,7 @@ export default function ProduccionLeche() {
                       {r.animales ? (
                         <Link
                           to={`/animales/${r.animales.id}`}
-                          className="text-green-700 hover:underline"
+                          className="text-cafe hover:underline"
                         >
                           {origen(r)}
                         </Link>

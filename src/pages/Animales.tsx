@@ -63,8 +63,11 @@ export default function Animales() {
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-green-800">Animales</h1>
-          <Link to="/inicio" className="text-green-700 hover:underline">
-            ← Inicio
+          <Link
+            to="/animales/nuevo"
+            className="bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2"
+          >
+            Nuevo animal
           </Link>
         </div>
 
@@ -108,7 +111,7 @@ export default function Animales() {
                 animales.map((a) => (
                   <tr key={a.id} className="border-t border-gray-100 hover:bg-green-50">
                     <td className="px-4 py-2 font-mono text-sm">
-                      <Link to={`/animales/${a.id}`} className="text-green-700 hover:underline">
+                      <Link to={`/animales/${a.id}`} className="text-cafe hover:underline">
                         {a.codigo}
                       </Link>
                     </td>

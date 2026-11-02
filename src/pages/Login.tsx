@@ -1,17 +1,30 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { ArrowRight, Leaf, LifeBuoy, Lock, Mail } from 'lucide-react'
 import { api } from '../api'
-import AuthLayout from '../components/AuthLayout'
+import Logo from '../components/Logo'
+import CampoAuth from '../components/CampoAuth'
+import FondoEstrellas from '../components/FondoEstrellas'
+
+// Si no existe public/login.jpg, se ve el degradado verde
+const FONDO_FOTO = [
+  'linear-gradient(to top, rgba(0,0,0,.5), rgba(0,0,0,.05) 50%, rgba(0,0,0,.25))',
+  "url('/login.jpg')",
+  'linear-gradient(135deg, #0A3A2A, #2F7D4F)',
+].join(', ')
 
 export default function Login() {
-  const [correo, setCorreo] = useState('')
-  const [contrasena, setContrasena] = useState('')
-  const [error, setError] = useState('')
-  const [cargando, setCargando] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const registrado = location.state?.registrado
+
+  const guardado = localStorage.getItem('correoRecordado') ?? ''
+  const [correo, setCorreo] = useState(guardado)
+  const [contrasena, setContrasena] = useState('')
+  const [recordar, setRecordar] = useState(!!guardado)
+  const [error, setError] = useState('')
+  const [cargando, setCargando] = useState(false)
 
   const entrar = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,6 +38,8 @@ export default function Login() {
       localStorage.setItem('accessToken', data.accessToken)
       localStorage.setItem('refreshToken', data.refreshToken)
       localStorage.setItem('user', JSON.stringify(data.user))
+      if (recordar) localStorage.setItem('correoRecordado', correo)
+      else localStorage.removeItem('correoRecordado')
       navigate('/inicio')
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
@@ -37,60 +52,118 @@ export default function Login() {
     }
   }
 
-  const campo =
-    'w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600'
-
   return (
-    <AuthLayout>
-      <form
-        onSubmit={entrar}
-        className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm space-y-4"
-      >
-        <h1 className="text-2xl font-bold text-green-800 text-center">
-          Iniciar sesión
-        </h1>
-
-        {registrado && (
-          <p className="text-green-700 text-sm text-center">
-            Cuenta creada. Ya puedes iniciar sesión.
-          </p>
-        )}
-
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={correo}
-          onChange={(e) => setCorreo(e.target.value)}
-          required
-          className={campo}
-        />
-
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={contrasena}
-          onChange={(e) => setContrasena(e.target.value)}
-          required
-          className={campo}
-        />
-
-        {error && <p className="text-red-600 text-sm">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={cargando}
-          className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold rounded-lg py-2 disabled:opacity-50"
+    <FondoEstrellas>
+      <div className="w-full max-w-5xl min-h-[600px] rounded-3xl overflow-hidden shadow-2xl grid md:grid-cols-[1.1fr_1fr] bg-crema">
+        {/* Foto */}
+        <div
+          className="relative hidden md:flex flex-col justify-between p-8 text-white"
+          style={{
+            backgroundImage: FONDO_FOTO,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
         >
-          {cargando ? 'Entrando...' : 'Iniciar sesión'}
-        </button>
+          <Logo claro />
+          <p
+            className="text-4xl leading-snug -rotate-6 origin-bottom-left mb-6 drop-shadow"
+            style={{ fontFamily: "'Caveat', 'Segoe Script', cursive" }}
+          >
+            Animales sanos,
+            <br />
+            fincas productivas,
+            <br />
+            siempre juntos ♡
+          </p>
+        </div>
 
-        <p className="text-sm text-center text-gray-600">
-          ¿No tienes cuenta?{' '}
-          <Link to="/registro" className="text-green-700 hover:underline">
-            Regístrate
-          </Link>
-        </p>
-      </form>
-    </AuthLayout>
+        {/* Formulario */}
+        <div className="relative flex items-center justify-center p-6 sm:p-10 overflow-hidden">
+          <Leaf className="absolute -bottom-8 -right-8 w-44 h-44 text-hoja/40 -rotate-[30deg]" />
+
+          <form onSubmit={entrar} className="relative w-full max-w-sm space-y-4">
+            <div className="md:hidden flex justify-center mb-2">
+              <Logo />
+            </div>
+
+            <div>
+              <h1 className="text-3xl font-bold text-bosque-oscuro">Iniciar sesión</h1>
+              <p className="text-sm text-gray-500 mt-1">Accede a tu cuenta para continuar</p>
+            </div>
+
+            {registrado && (
+              <p className="text-sm text-bosque bg-menta rounded-lg px-3 py-2">
+                Cuenta creada. Ya puedes iniciar sesión.
+              </p>
+            )}
+
+            <CampoAuth
+              icono={Mail}
+              tipo="email"
+              placeholder="Correo electrónico"
+              valor={correo}
+              onCambio={setCorreo}
+            />
+
+            <CampoAuth
+              icono={Lock}
+              tipo="password"
+              placeholder="Contraseña"
+              valor={contrasena}
+              onCambio={setContrasena}
+            />
+
+            <div className="flex items-center justify-between text-xs">
+              <label className="flex items-center gap-2 text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={recordar}
+                  onChange={(e) => setRecordar(e.target.checked)}
+                  className="accent-bosque"
+                />
+                Recordarme
+              </label>
+              <button
+                type="button"
+                disabled
+                title="Próximamente"
+                className="text-bosque disabled:opacity-60"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+
+            {error && <p className="text-red-600 text-sm">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={cargando}
+              className="w-full flex items-center justify-center gap-2 bg-bosque hover:bg-bosque-oscuro text-white font-semibold rounded-lg py-3 disabled:opacity-50"
+            >
+              {cargando ? 'Entrando...' : 'Iniciar sesión'}
+              {!cargando && <ArrowRight className="w-4 h-4" />}
+            </button>
+
+            <div className="flex items-center gap-3">
+              <span className="flex-1 border-t border-gray-300" />
+              <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+              <span className="flex-1 border-t border-gray-300" />
+            </div>
+
+            <Link
+              to="/registro"
+              className="block text-center border border-bosque text-bosque font-semibold rounded-lg py-3 hover:bg-menta"
+            >
+              Crear una cuenta
+            </Link>
+
+            <p className="flex items-center gap-2 text-sm text-gray-500">
+              <LifeBuoy className="w-4 h-4" />
+              ¿Necesitas ayuda?
+            </p>
+          </form>
+        </div>
+      </div>
+    </FondoEstrellas>
   )
 }

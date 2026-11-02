@@ -1,1 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap');
 @import "tailwindcss";
+
+@theme {
+  /* Paleta nueva (estimada de tu diseño) */
+  --color-crema: #F5F2E9;
+  --color-bosque: #0F5C3F;
+  --color-bosque-oscuro: #0A3A2A;
+  --color-activo: #1E7B50;
+  --color-hoja: #7FB069;
+  --color-menta: #DCEBDD;
+
+  /* Lo que ya estaba en verde pasa a usar la paleta nueva */
+  --color-green-50: #F5F2E9;
+  --color-green-100: #DCEBDD;
+  --color-green-200: #C8DEC9;
+  --color-green-600: #0F5C3F;
+  --color-green-700: #0F5C3F;
+  --color-green-800: #0A3A2A;
+  --color-green-900: #082E21;
+
+  /* Colores viejos, solo para el login actual */
+  --color-salvia: #A7C957;
+  --color-verde-claro: #C5E1A5;
+  --color-beige: #EAD9C8;
+  --color-marfil: #F7F2E7;
+  --color-cafe: #8D6E63;
+}
+
+body {
+  margin: 0;
+}
