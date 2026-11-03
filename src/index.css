@@ -2,22 +2,26 @@
 @import "tailwindcss";
 
 @theme {
-  /* Paleta nueva (estimada de tu diseño) */
-  --color-crema: #F5F2E9;
-  --color-bosque: #0F5C3F;
-  --color-bosque-oscuro: #0A3A2A;
-  --color-activo: #1E7B50;
+  /* Paleta nueva, tomada del diseño */
+  --color-crema: #fbf6eb;
+  --color-bosque: #476b2b;
+  --color-bosque-oscuro: #3a5a22;
+  --color-activo: #4e8539;
   --color-hoja: #7FB069;
-  --color-menta: #DCEBDD;
+  --color-menta: #e4e9d5;
+  --color-marron: #6c320c;
+  --color-rosa: #fddfdd;
+  --color-durazno: #fee8c0;
+  --color-blanco-calido: #fefdfb;
 
   /* Lo que ya estaba en verde pasa a usar la paleta nueva */
-  --color-green-50: #F5F2E9;
-  --color-green-100: #DCEBDD;
-  --color-green-200: #C8DEC9;
-  --color-green-600: #0F5C3F;
-  --color-green-700: #0F5C3F;
-  --color-green-800: #0A3A2A;
-  --color-green-900: #082E21;
+  --color-green-50: #fbf6eb;
+  --color-green-100: #e4e9d5;
+  --color-green-200: #e3ecc5;
+  --color-green-600: #4e8539;
+  --color-green-700: #476b2b;
+  --color-green-800: #3a5a22;
+  --color-green-900: #0f2207;
 
   /* Colores viejos, solo para el login actual */
   --color-salvia: #A7C957;
