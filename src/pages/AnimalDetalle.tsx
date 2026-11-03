@@ -1,7 +1,7 @@
-
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
+import { puede } from '../permisos'
 
 interface Animal {
   id: number
@@ -27,6 +27,7 @@ export default function AnimalDetalle() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [eliminando, setEliminando] = useState(false)
+  const puedeEditar = puede('animales.editar')
 
   useEffect(() => {
     setCargando(true)
@@ -118,21 +119,23 @@ export default function AnimalDetalle() {
             <Fila etiqueta="Lote" valor={animal.lotes_animales?.nombre ?? '—'} />
             <Fila etiqueta="Potrero" valor={animal.potrero_id ?? '—'} />
 
-            <div className="flex gap-3 mt-6">
-              <Link
-                to={`/animales/${animal.id}/editar`}
-                className="flex-1 text-center bg-green-700 hover:bg-green-800 text-white rounded-lg py-2"
-              >
-                Editar
-              </Link>
-              <button
-                onClick={eliminar}
-                disabled={eliminando}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-lg py-2 disabled:opacity-50"
-              >
-                {eliminando ? 'Eliminando...' : 'Eliminar'}
-              </button>
-            </div>
+            {puedeEditar && (
+              <div className="flex gap-3 mt-6">
+                <Link
+                  to={`/animales/${animal.id}/editar`}
+                  className="flex-1 text-center bg-green-700 hover:bg-green-800 text-white rounded-lg py-2"
+                >
+                  Editar
+                </Link>
+                <button
+                  onClick={eliminar}
+                  disabled={eliminando}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-lg py-2 disabled:opacity-50"
+                >
+                  {eliminando ? 'Eliminando...' : 'Eliminar'}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

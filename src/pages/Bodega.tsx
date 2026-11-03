@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
+import { puede } from '../permisos'
 
 interface Insumo {
   id: number
@@ -50,17 +51,14 @@ export default function Bodega() {
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-green-800">Inventario</h1>
-          <div className="flex items-center gap-4">
+          {puede('insumos.crear') && (
             <Link
               to="/bodega/nuevo"
               className="bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2"
             >
               Nuevo insumo
             </Link>
-            <Link to="/inicio" className="text-green-700 hover:underline">
-              ← Inicio
-            </Link>
-          </div>
+          )}
         </div>
 
         {error && <p className="text-red-600 mb-3">{error}</p>}

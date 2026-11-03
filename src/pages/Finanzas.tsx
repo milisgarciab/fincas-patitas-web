@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
+import { puede } from '../permisos'
 
 interface Gasto {
   id: number
@@ -34,6 +35,7 @@ const campo =
   'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600'
 
 export default function Finanzas() {
+  const puedeEditar = puede('finanzas.editar')
   const [pestana, setPestana] = useState<Pestana>('gastos')
   const [gastos, setGastos] = useState<Gasto[]>([])
   const [ventas, setVentas] = useState<Venta[]>([])
@@ -178,7 +180,7 @@ export default function Finanzas() {
           </div>
           <button
             onClick={() => setMostrarForm((m) => !m)}
-            className="bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2"
+            className={`bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2 ${puedeEditar ? '' : 'hidden'}`}
           >
             {mostrarForm ? 'Cancelar' : pestana === 'gastos' ? 'Nuevo gasto' : 'Nueva venta'}
           </button>

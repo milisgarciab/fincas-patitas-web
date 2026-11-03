@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
+import { puede } from '../permisos'
 
 interface Precio {
   id: number
@@ -32,6 +33,8 @@ const campo =
   'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600'
 
 export default function MercadoBalance() {
+  const puedeConfigurarPrecios = puede('precios.configurar')
+  const puedeGenerarBalance = puede('finanzas.editar')
   const [pestana, setPestana] = useState<Pestana>('precios')
   const [precios, setPrecios] = useState<Precio[]>([])
   const [balances, setBalances] = useState<Balance[]>([])
@@ -148,7 +151,7 @@ export default function MercadoBalance() {
           </div>
           <button
             onClick={() => setMostrarForm((m) => !m)}
-            className="bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2"
+            className={`bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-2 ${(pestana === 'precios' ? puedeConfigurarPrecios : puedeGenerarBalance) ? '' : 'hidden'}`}
           >
             {mostrarForm ? 'Cancelar' : pestana === 'precios' ? 'Nuevo precio' : 'Generar balance'}
           </button>

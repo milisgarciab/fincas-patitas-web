@@ -17,6 +17,8 @@ import {
   X,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { NOMBRE_ROL, puede, rolActual } from '../permisos'
+import type { Permiso } from '../permisos'
 
 interface Item {
   texto: string
@@ -29,12 +31,7 @@ interface Opcion {
   ruta?: string
   exacta?: boolean
   hijos?: Item[]
-}
-
-const ROLES: Record<number, string> = {
-  1: 'Administrador',
-  2: 'Encargado',
-  3: 'Empleado',
+  permiso?: Permiso
 }
 
 const MENU: Opcion[] = [
@@ -51,15 +48,16 @@ const MENU: Opcion[] = [
   { texto: 'Inventario', icono: Package, ruta: '/bodega' },
   { texto: 'Salud', icono: HeartPulse, ruta: '/salud' },
   { texto: 'Reproducción', icono: Baby, ruta: '/reproduccion' },
-  { texto: 'Finanzas', icono: Wallet, ruta: '/finanzas' },
+  { texto: 'Finanzas', icono: Wallet, ruta: '/finanzas', permiso: 'finanzas.ver' },
 ]
 
 export default function Layout() {
   const navigate = useNavigate()
   const location = useLocation()
   const user = JSON.parse(localStorage.getItem('user') ?? '{}')
-  const rol = ROLES[user.rol_id] ?? 'Usuario'
+  const rol = NOMBRE_ROL[rolActual()] ?? 'Usuario'
   const inicial = (user.nombre_usuario ?? '?').charAt(0).toUpperCase()
+  const menu = MENU.filter((m) => !m.permiso || puede(m.permiso))
 
   const [menuMovil, setMenuMovil] = useState(false)
   const [menuUsuario, setMenuUsuario] = useState(false)
@@ -103,7 +101,7 @@ export default function Layout() {
       </Link>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        {MENU.map((m) => {
+        {menu.map((m) => {
           const Icono = m.icono
 
           if (m.ruta) {
