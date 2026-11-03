@@ -1,36 +1,185 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Caveat:wght@500;600&family=Nunito:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
+/* Permite usar dark:clase en el código nuevo */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  /* Paleta nueva, tomada del diseño */
-  --color-crema: #fbf6eb;
-  --color-bosque: #476b2b;
-  --color-bosque-oscuro: #3a5a22;
-  --color-activo: #4e8539;
-  --color-hoja: #7FB069;
-  --color-menta: #e4e9d5;
-  --color-marron: #6c320c;
-  --color-rosa: #fddfdd;
-  --color-durazno: #fee8c0;
-  --color-blanco-calido: #fefdfb;
+  --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Baloo 2', 'Nunito', ui-sans-serif, sans-serif;
 
-  /* Lo que ya estaba en verde pasa a usar la paleta nueva */
-  --color-green-50: #fbf6eb;
-  --color-green-100: #e4e9d5;
-  --color-green-200: #e3ecc5;
-  --color-green-600: #4e8539;
-  --color-green-700: #476b2b;
-  --color-green-800: #3a5a22;
-  --color-green-900: #0f2207;
+  /* Paleta estimada de tu diseño */
+  --color-crema: #FBF6EA;
+  --color-bosque: #4F7A2B;
+  --color-bosque-oscuro: #3D5F22;
+  --color-activo: #4F7A2B;
+  --color-hoja: #8DB660;
+  --color-menta: #E8F0D8;
+  --color-marron: #6B3A1E;
 
-  /* Colores viejos, solo para el login actual */
-  --color-salvia: #A7C957;
-  --color-verde-claro: #C5E1A5;
-  --color-beige: #EAD9C8;
-  --color-marfil: #F7F2E7;
-  --color-cafe: #8D6E63;
+  /* Las pantallas viejas que usan "green" toman la paleta nueva */
+  --color-green-50: #FBF6EA;
+  --color-green-100: #E8F0D8;
+  --color-green-200: #D5E5BC;
+  --color-green-600: #4F7A2B;
+  --color-green-700: #4F7A2B;
+  --color-green-800: #3D5F22;
+  --color-green-900: #2F4A1A;
 }
 
-body {
-  margin: 0;
+@layer base {
+  body {
+    margin: 0;
+    background-color: #FBF6EA;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+}
+
+/* ---------- Interruptor modo claro / oscuro ---------- */
+/* Basado en Uiverse.io, de Creatlydev. Para cambiar el tamaño, edita font-size */
+.toggle-etiqueta {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.toggle {
+  --bg-toggle: hsl(0, 0%, 96%);
+  --bg-circle: hsl(96, 85%, 34%);
+  font-size: 4.5px;
+  width: 12em;
+  height: 6em;
+  background-color: var(--bg-toggle);
+  box-shadow: 0 0.48em 3em 0 rgba(125, 125, 125, 0.25);
+  border-radius: 4em;
+  display: flex;
+  align-items: center;
+  padding: 0 0.48em;
+  transition: background-color 400ms;
+}
+
+.toggle__circle {
+  width: 5em;
+  height: 5em;
+  background-color: var(--bg-circle);
+  border-radius: 50%;
+  position: relative;
+  transition: margin 400ms ease-in-out, background-color 1000ms;
+}
+
+.toggle__circle::after,
+.toggle__circle::before {
+  content: '';
+  position: absolute;
+  background-color: var(--bg-toggle);
+  bottom: 118%;
+  transform-origin: bottom left;
+}
+
+.toggle__circle::before {
+  width: 1.5em;
+  height: 2.5em;
+  left: 32%;
+  border-radius: 0% 100% 0% 100% / 0% 27% 73% 100%;
+  transform: translateX(-70%) rotate(-2deg);
+}
+
+.toggle__circle::after {
+  width: 2.5em;
+  height: 3em;
+  left: 48%;
+  border-radius: 100% 0% 100% 0% / 100% 0% 100% 0%;
+  transform: rotate(-20deg);
+}
+
+.toggle-input:checked + .toggle > .toggle__circle {
+  margin-left: calc(12em - 0.96em - 5em);
+}
+
+.toggle-input:checked + .toggle {
+  --bg-toggle: hsl(96, 85%, 34%);
+  --bg-circle: hsl(0, 0%, 96%);
+}
+
+.toggle-input:focus-visible + .toggle {
+  outline: 2px solid #4F7A2B;
+  outline-offset: 3px;
+}
+
+/* ---------- Modo oscuro ---------- */
+.dark {
+  color-scheme: dark;
+  --color-crema: #141A12;
+  --color-green-50: #141A12;
+  --color-green-100: #243321;
+  --color-green-200: #2E4029;
+  --color-menta: #243321;
+  --color-marron: #EADBC8;
+}
+
+.dark body {
+  background-color: #141A12;
+  color: #E8EDE0;
+}
+
+.dark .bg-white {
+  background-color: #1D2719;
+}
+
+.dark .bg-gray-200 {
+  background-color: #34402F;
+}
+
+.dark .text-gray-400 {
+  color: #8E9A86;
+}
+.dark .text-gray-500 {
+  color: #A3AE9A;
+}
+.dark .text-gray-600 {
+  color: #B4BEAB;
+}
+.dark .text-gray-700 {
+  color: #C6CFBE;
+}
+.dark .text-gray-800 {
+  color: #E0E7D8;
+}
+
+.dark .text-green-700,
+.dark .text-bosque {
+  color: #9CCB6B;
+}
+.dark .text-green-800,
+.dark .text-bosque-oscuro {
+  color: #B7D98B;
+}
+
+.dark .border-gray-100,
+.dark .border-gray-200 {
+  border-color: #2C3828;
+}
+.dark .border-gray-300 {
+  border-color: #3C4A36;
+}
+.dark .border-black\/5,
+.dark .border-black\/10 {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.dark .hover\:bg-black\/5:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  color: #E8EDE0;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #7E8A76;
 }

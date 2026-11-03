@@ -42,10 +42,7 @@ export default function Registro() {
   }
 
   return (
-    <div
-      className="min-h-screen p-3 sm:p-6 flex items-center justify-center"
-      style={{ background: 'linear-gradient(135deg, #E3F0D8, #F4F9EE)' }}
-    >
+    <div className="min-h-screen p-3 sm:p-6 flex items-center justify-center bg-gradient-to-br from-[#E3F0D8] to-[#F4F9EE] dark:from-[#141A12] dark:to-[#1D2719]">
       <div className="relative w-full max-w-5xl min-h-[640px] rounded-3xl overflow-hidden grid md:grid-cols-[1.1fr_1fr]">
         <Leaf className="absolute -top-6 -left-6 w-40 h-40 text-hoja/40 rotate-12" />
 
