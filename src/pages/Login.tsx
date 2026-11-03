@@ -7,13 +7,6 @@ import Logo from '../components/Logo'
 import CampoAuth from '../components/CampoAuth'
 import FondoEstrellas from '../components/FondoEstrellas'
 
-// Si no existe public/login.jpg, se ve el degradado verde
-const FONDO_FOTO = [
-  'linear-gradient(to top, rgba(0,0,0,.5), rgba(0,0,0,.05) 50%, rgba(0,0,0,.25))',
-  "url('/login.jpg')",
-  'linear-gradient(135deg, #0A3A2A, #2F7D4F)',
-].join(', ')
-
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -55,18 +48,26 @@ export default function Login() {
   return (
     <FondoEstrellas>
       <div className="w-full max-w-5xl min-h-[600px] rounded-3xl overflow-hidden shadow-2xl grid md:grid-cols-[1.1fr_1fr] bg-crema">
-        {/* Foto */}
+        {/* Video */}
         <div
-          className="relative hidden md:flex flex-col justify-between p-8 text-white"
-          style={{
-            backgroundImage: FONDO_FOTO,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
+          className="relative hidden md:flex flex-col justify-between p-8 text-white overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #0A3A2A, #2F7D4F)' }}
         >
-          <Logo claro />
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            src="/login.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/30" />
+
+          <div className="relative z-10">
+            <Logo claro />
+          </div>
           <p
-            className="text-4xl leading-snug -rotate-6 origin-bottom-left mb-6 drop-shadow"
+            className="relative z-10 text-4xl leading-snug -rotate-6 origin-bottom-left mb-6 drop-shadow"
             style={{ fontFamily: "'Caveat', 'Segoe Script', cursive" }}
           >
             Animales sanos,
