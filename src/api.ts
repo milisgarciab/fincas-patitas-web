@@ -1,7 +1,8 @@
 import axios from 'axios'
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
+import { limpiarSesion } from './sesion'
 
-// Ruta del backend que renueva la sesión (verifícala en Swagger)
+// Ruta del backend que renueva la sesión
 const RUTA_REFRESH = '/auth/refresh'
 
 export const api = axios.create({
@@ -58,7 +59,7 @@ api.interceptors.response.use(
       config.headers.Authorization = `Bearer ${nuevoToken}`
       return api(config)
     } catch {
-      localStorage.clear()
+      limpiarSesion()
       window.location.href = '/'
       return Promise.reject(error)
     }

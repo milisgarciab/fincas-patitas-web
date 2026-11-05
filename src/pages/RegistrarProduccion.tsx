@@ -43,7 +43,7 @@ export default function RegistrarProduccion({ tipo }: Props) {
 
     try {
       await api.post(esLeche ? '/produccion-leche' : '/produccion-huevos', body)
-      navigate(`/produccion/${tipo}`)
+      navigate('/produccion')
     } catch (err: any) {
       setError(err.response?.data?.error?.message ?? 'No se pudo guardar el registro')
     } finally {
@@ -57,8 +57,8 @@ export default function RegistrarProduccion({ tipo }: Props) {
   return (
     <div className="min-h-screen bg-green-50 p-6">
       <div className="max-w-xl mx-auto">
-        <Link to={`/produccion/${tipo}`} className="text-green-700 hover:underline">
-          ← Volver a producción de {tipo}
+        <Link to="/produccion" className="text-green-700 hover:underline">
+          ← Volver a producción
         </Link>
 
         <form

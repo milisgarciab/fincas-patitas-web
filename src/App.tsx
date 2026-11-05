@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Layout from './components/Layout'
 import Login from './pages/Login'
 import Registro from './pages/Registro'
 import Inicio from './pages/Inicio'
@@ -6,8 +7,7 @@ import Animales from './pages/Animales'
 import AnimalDetalle from './pages/AnimalDetalle'
 import CrearAnimal from './pages/CrearAnimal'
 import EditarAnimal from './pages/EditarAnimal'
-import ProduccionLeche from './pages/ProduccionLeche'
-import ProduccionHuevos from './pages/ProduccionHuevos'
+import Produccion from './pages/Produccion'
 import RegistrarProduccion from './pages/RegistrarProduccion'
 import Bodega from './pages/Bodega'
 import CrearInsumo from './pages/CrearInsumo'
@@ -16,6 +16,7 @@ import CrearEventoSanitario from './pages/CrearEventoSanitario'
 import Reproduccion from './pages/Reproduccion'
 import CrearReproduccion from './pages/CrearReproduccion'
 import Finanzas from './pages/Finanzas'
+import Ubicacion from './pages/Ubicacion'
 import MercadoBalance from './pages/MercadoBalance'
 
 function Protegida({ children }: { children: React.ReactNode }) {
@@ -28,142 +29,34 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
+
         <Route
-          path="/inicio"
           element={
             <Protegida>
-              <Inicio />
+              <Layout />
             </Protegida>
           }
-        />
-        <Route
-          path="/animales"
-          element={
-            <Protegida>
-              <Animales />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/animales/nuevo"
-          element={
-            <Protegida>
-              <CrearAnimal />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/animales/:id/editar"
-          element={
-            <Protegida>
-              <EditarAnimal />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/animales/:id"
-          element={
-            <Protegida>
-              <AnimalDetalle />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/produccion/leche"
-          element={
-            <Protegida>
-              <ProduccionLeche />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/produccion/leche/nuevo"
-          element={
-            <Protegida>
-              <RegistrarProduccion tipo="leche" />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/produccion/huevos"
-          element={
-            <Protegida>
-              <ProduccionHuevos />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/produccion/huevos/nuevo"
-          element={
-            <Protegida>
-              <RegistrarProduccion tipo="huevos" />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/bodega"
-          element={
-            <Protegida>
-              <Bodega />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/bodega/nuevo"
-          element={
-            <Protegida>
-              <CrearInsumo />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/salud"
-          element={
-            <Protegida>
-              <EventosSanitarios />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/salud/nuevo"
-          element={
-            <Protegida>
-              <CrearEventoSanitario />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/reproduccion"
-          element={
-            <Protegida>
-              <Reproduccion />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/reproduccion/nuevo"
-          element={
-            <Protegida>
-              <CrearReproduccion />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/finanzas"
-          element={
-            <Protegida>
-              <Finanzas />
-            </Protegida>
-          }
-        />
-        <Route
-          path="/finanzas/balance"
-          element={
-            <Protegida>
-              <MercadoBalance />
-            </Protegida>
-          }
-        />
+        >
+          <Route path="/inicio" element={<Inicio />} />
+<Route path="/ubicacion" element={<Ubicacion />} />
+          <Route path="/animales" element={<Animales />} />
+          <Route path="/animales/nuevo" element={<CrearAnimal />} />
+          <Route path="/animales/:id/editar" element={<EditarAnimal />} />
+          <Route path="/animales/:id" element={<AnimalDetalle />} />
+          <Route path="/produccion" element={<Produccion />} />
+          <Route path="/produccion/leche" element={<Navigate to="/produccion" replace />} />
+          <Route path="/produccion/huevos" element={<Navigate to="/produccion" replace />} />
+          <Route path="/produccion/leche/nuevo" element={<RegistrarProduccion tipo="leche" />} />
+          <Route path="/produccion/huevos/nuevo" element={<RegistrarProduccion tipo="huevos" />} />
+          <Route path="/bodega" element={<Bodega />} />
+          <Route path="/bodega/nuevo" element={<CrearInsumo />} />
+          <Route path="/salud" element={<EventosSanitarios />} />
+          <Route path="/salud/nuevo" element={<CrearEventoSanitario />} />
+          <Route path="/reproduccion" element={<Reproduccion />} />
+          <Route path="/reproduccion/nuevo" element={<CrearReproduccion />} />
+          <Route path="/finanzas" element={<Finanzas />} />
+          <Route path="/finanzas/balance" element={<MercadoBalance />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )
