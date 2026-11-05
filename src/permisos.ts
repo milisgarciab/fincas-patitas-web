@@ -15,6 +15,7 @@ export type Permiso =
   | 'registros.eliminar' // eliminar registros (el Empleado solo edita)
   | 'usuarios.ver' // lista de usuarios (para cuando exista la pantalla)
   | 'usuarios.gestionar' // crear, cambiar rol y activar/desactivar usuarios
+  | 'ubicacion.editar' // cambiar la ubicación de la finca en el mapa
 
 // Qué roles tienen cada permiso (según la matriz de permisos)
 const PERMISOS: Record<Permiso, number[]> = {
@@ -27,6 +28,7 @@ const PERMISOS: Record<Permiso, number[]> = {
   'registros.eliminar': [1, 2],
   'usuarios.ver': [1, 2],
   'usuarios.gestionar': [1],
+  'ubicacion.editar': [1, 2],
 }
 
 export function rolActual(): number {

@@ -16,6 +16,7 @@ import CrearEventoSanitario from './pages/CrearEventoSanitario'
 import Reproduccion from './pages/Reproduccion'
 import CrearReproduccion from './pages/CrearReproduccion'
 import Finanzas from './pages/Finanzas'
+import Ubicacion from './pages/Ubicacion'
 import MercadoBalance from './pages/MercadoBalance'
 
 function Protegida({ children }: { children: React.ReactNode }) {
@@ -37,6 +38,7 @@ export default function App() {
           }
         >
           <Route path="/inicio" element={<Inicio />} />
+<Route path="/ubicacion" element={<Ubicacion />} />
           <Route path="/animales" element={<Animales />} />
           <Route path="/animales/nuevo" element={<CrearAnimal />} />
           <Route path="/animales/:id/editar" element={<EditarAnimal />} />
