@@ -8,12 +8,12 @@ import {
   HeartPulse,
   Home,
   LogOut,
-   Menu,
-  MapPin,
+  Menu,
   Milk,
   Package,
   PawPrint,
   Search,
+  Users,
   Wallet,
   X,
 } from 'lucide-react'
@@ -52,6 +52,7 @@ const MENU: Opcion[] = [
   { texto: 'Salud', icono: HeartPulse, ruta: '/salud' },
   { texto: 'Reproducción', icono: Baby, ruta: '/reproduccion' },
   { texto: 'Finanzas', icono: Wallet, ruta: '/finanzas', permiso: 'finanzas.ver' },
+  { texto: 'Usuarios', icono: Users, ruta: '/usuarios', permiso: 'usuarios.ver' },
 ]
 
 export default function Layout() {
