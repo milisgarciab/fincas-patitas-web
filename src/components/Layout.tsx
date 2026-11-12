@@ -129,7 +129,10 @@ export default function Layout() {
           return (
             <div key={m.texto}>
               <button
-                onClick={() => setProduccionAbierta((a) => !a)}
+                onClick={() => {
+                 setProduccionAbierta(true)
+                 navigate('/produccion')
+  }}
                 className={`w-full ${claseItem(activo && !produccionAbierta)}`}
               >
                 <Icono className="w-5 h-5" />

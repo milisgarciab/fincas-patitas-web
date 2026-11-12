@@ -8,6 +8,8 @@ import AnimalDetalle from './pages/AnimalDetalle'
 import CrearAnimal from './pages/CrearAnimal'
 import EditarAnimal from './pages/EditarAnimal'
 import Produccion from './pages/Produccion'
+import ProduccionLeche from './pages/ProduccionLeche'
+import ProduccionHuevos from './pages/ProduccionHuevos'
 import RegistrarProduccion from './pages/RegistrarProduccion'
 import Bodega from './pages/Bodega'
 import CrearInsumo from './pages/CrearInsumo'
@@ -65,8 +67,8 @@ export default function App() {
           <Route path="/animales/:id" element={<AnimalDetalle />} />
 
           <Route path="/produccion" element={<Produccion />} />
-          <Route path="/produccion/leche" element={<Navigate to="/produccion" replace />} />
-          <Route path="/produccion/huevos" element={<Navigate to="/produccion" replace />} />
+          <Route path="/produccion/leche" element={<ProduccionLeche />} />
+          <Route path="/produccion/huevos" element={<ProduccionHuevos />} />
           <Route path="/produccion/leche/nuevo" element={<RegistrarProduccion tipo="leche" />} />
           <Route path="/produccion/huevos/nuevo" element={<RegistrarProduccion tipo="huevos" />} />
 
