@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import SelectorAnimal from '../components/SelectorAnimal'
 
 interface Props {
   tipo: 'leche' | 'huevos'
@@ -10,8 +11,9 @@ export default function RegistrarProduccion({ tipo }: Props) {
   const navigate = useNavigate()
   const esLeche = tipo === 'leche'
 
-  const [paraQuien, setParaQuien] = useState<'animal' | 'lote'>('lote')
-  const [idDestino, setIdDestino] = useState('')
+  const [paraQuien, setParaQuien] = useState<'animal' | 'lote'>('animal')
+  const [animalId, setAnimalId] = useState('')
+  const [loteId, setLoteId] = useState('')
   const [litros, setLitros] = useState('')
   const [cantidad, setCantidad] = useState('')
   const [rotos, setRotos] = useState('0')
@@ -28,7 +30,9 @@ export default function RegistrarProduccion({ tipo }: Props) {
     setGuardando(true)
 
     const body: Record<string, unknown> = {
-      [paraQuien === 'animal' ? 'animal_id' : 'lote_id']: Number(idDestino),
+      [paraQuien === 'animal' ? 'animal_id' : 'lote_id']: Number(
+        paraQuien === 'animal' ? animalId : loteId,
+      ),
       observaciones: observaciones || undefined,
       registrado_en: fechaHora ? new Date(fechaHora).toISOString() : undefined,
     }
@@ -52,20 +56,17 @@ export default function RegistrarProduccion({ tipo }: Props) {
   }
 
   const campo =
-    'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600'
+    'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-bosque/40'
 
   return (
-    <div className="min-h-screen bg-green-50 p-6">
+    <div className="p-4 sm:p-6">
       <div className="max-w-xl mx-auto">
-        <Link to={`/produccion/${tipo}`} className="text-green-700 hover:underline">
-          ← Volver a producción
+        <Link to={`/produccion/${tipo}`} className="text-bosque hover:underline">
+          ← Volver a {esLeche ? 'leche' : 'huevos'}
         </Link>
 
-        <form
-          onSubmit={guardar}
-          className="mt-4 bg-white rounded-xl shadow p-6 space-y-4"
-        >
-          <h1 className="text-2xl font-bold text-green-800">
+        <form onSubmit={guardar} className="mt-4 bg-white rounded-xl shadow p-6 space-y-4">
+          <h1 className="text-2xl font-bold text-bosque-oscuro">
             Registrar {esLeche ? 'leche' : 'huevos'}
           </h1>
 
@@ -76,30 +77,31 @@ export default function RegistrarProduccion({ tipo }: Props) {
               onChange={(e) => setParaQuien(e.target.value as 'animal' | 'lote')}
               className={campo}
             >
-              <option value="lote">Un lote</option>
               <option value="animal">Un animal</option>
+              <option value="lote">Un lote</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              {paraQuien === 'animal' ? 'ID del animal' : 'ID del lote'}
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={idDestino}
-              onChange={(e) => setIdDestino(e.target.value)}
-              required
-              className={campo}
+          {paraQuien === 'animal' ? (
+            <SelectorAnimal
+              etiqueta="Animal"
+              valor={animalId}
+              onCambio={setAnimalId}
+              requerido
             />
-            {paraQuien === 'animal' && (
-              <p className="text-xs text-gray-500 mt-1">
-                El ID está en la dirección del detalle del animal (por ejemplo
-                /animales/41).
-              </p>
-            )}
-          </div>
+          ) : (
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Número del lote</label>
+              <input
+                type="number"
+                min="1"
+                value={loteId}
+                onChange={(e) => setLoteId(e.target.value)}
+                required
+                className={campo}
+              />
+            </div>
+          )}
 
           {esLeche ? (
             <>
@@ -155,9 +157,7 @@ export default function RegistrarProduccion({ tipo }: Props) {
           )}
 
           <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              Fecha y hora (opcional)
-            </label>
+            <label className="block text-sm text-gray-600 mb-1">Fecha y hora (opcional)</label>
             <input
               type="datetime-local"
               value={fechaHora}
@@ -167,9 +167,7 @@ export default function RegistrarProduccion({ tipo }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              Observaciones (opcional)
-            </label>
+            <label className="block text-sm text-gray-600 mb-1">Observaciones (opcional)</label>
             <textarea
               value={observaciones}
               onChange={(e) => setObservaciones(e.target.value)}
@@ -183,7 +181,7 @@ export default function RegistrarProduccion({ tipo }: Props) {
           <button
             type="submit"
             disabled={guardando}
-            className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold rounded-lg py-2 disabled:opacity-50"
+            className="w-full bg-bosque hover:bg-bosque-oscuro text-white font-semibold rounded-lg py-2 disabled:opacity-50"
           >
             {guardando ? 'Guardando...' : 'Guardar registro'}
           </button>
