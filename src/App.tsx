@@ -16,11 +16,24 @@ import CrearEventoSanitario from './pages/CrearEventoSanitario'
 import Reproduccion from './pages/Reproduccion'
 import CrearReproduccion from './pages/CrearReproduccion'
 import Finanzas from './pages/Finanzas'
-import Ubicacion from './pages/Ubicacion'
 import MercadoBalance from './pages/MercadoBalance'
+import Usuarios from './pages/Usuarios'
+import { puede } from './permisos'
+import type { Permiso } from './permisos'
 
 function Protegida({ children }: { children: React.ReactNode }) {
   return localStorage.getItem('accessToken') ? children : <Navigate to="/" />
+}
+
+// Si el rol no tiene el permiso, vuelve al Inicio
+function ConPermiso({
+  permiso,
+  children,
+}: {
+  permiso: Permiso
+  children: React.ReactNode
+}) {
+  return puede(permiso) ? children : <Navigate to="/inicio" replace />
 }
 
 export default function App() {
@@ -38,24 +51,66 @@ export default function App() {
           }
         >
           <Route path="/inicio" element={<Inicio />} />
-<Route path="/ubicacion" element={<Ubicacion />} />
+
           <Route path="/animales" element={<Animales />} />
           <Route path="/animales/nuevo" element={<CrearAnimal />} />
-          <Route path="/animales/:id/editar" element={<EditarAnimal />} />
+          <Route
+            path="/animales/:id/editar"
+            element={
+              <ConPermiso permiso="animales.editar">
+                <EditarAnimal />
+              </ConPermiso>
+            }
+          />
           <Route path="/animales/:id" element={<AnimalDetalle />} />
+
           <Route path="/produccion" element={<Produccion />} />
           <Route path="/produccion/leche" element={<Navigate to="/produccion" replace />} />
           <Route path="/produccion/huevos" element={<Navigate to="/produccion" replace />} />
           <Route path="/produccion/leche/nuevo" element={<RegistrarProduccion tipo="leche" />} />
           <Route path="/produccion/huevos/nuevo" element={<RegistrarProduccion tipo="huevos" />} />
+
           <Route path="/bodega" element={<Bodega />} />
-          <Route path="/bodega/nuevo" element={<CrearInsumo />} />
+          <Route
+            path="/bodega/nuevo"
+            element={
+              <ConPermiso permiso="insumos.crear">
+                <CrearInsumo />
+              </ConPermiso>
+            }
+          />
+
           <Route path="/salud" element={<EventosSanitarios />} />
           <Route path="/salud/nuevo" element={<CrearEventoSanitario />} />
+
           <Route path="/reproduccion" element={<Reproduccion />} />
           <Route path="/reproduccion/nuevo" element={<CrearReproduccion />} />
-          <Route path="/finanzas" element={<Finanzas />} />
-          <Route path="/finanzas/balance" element={<MercadoBalance />} />
+
+          <Route
+            path="/finanzas"
+            element={
+              <ConPermiso permiso="finanzas.ver">
+                <Finanzas />
+              </ConPermiso>
+            }
+          />
+          <Route
+            path="/finanzas/balance"
+            element={
+              <ConPermiso permiso="finanzas.ver">
+                <MercadoBalance />
+              </ConPermiso>
+            }
+          />
+
+          <Route
+            path="/usuarios"
+            element={
+              <ConPermiso permiso="usuarios.ver">
+                <Usuarios />
+              </ConPermiso>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>
