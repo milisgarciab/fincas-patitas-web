@@ -8,6 +8,7 @@ import {
   HeartPulse,
   Home,
   LogOut,
+  MapPin,
   Menu,
   Milk,
   Package,
@@ -51,6 +52,7 @@ const MENU: Opcion[] = [
   { texto: 'Inventario', icono: Package, ruta: '/bodega' },
   { texto: 'Salud', icono: HeartPulse, ruta: '/salud' },
   { texto: 'Reproducción', icono: Baby, ruta: '/reproduccion' },
+  { texto: 'Ubicación', icono: MapPin, ruta: '/ubicacion' },
   { texto: 'Finanzas', icono: Wallet, ruta: '/finanzas', permiso: 'finanzas.ver' },
   { texto: 'Usuarios', icono: Users, ruta: '/usuarios', permiso: 'usuarios.ver' },
 ]
@@ -130,9 +132,9 @@ export default function Layout() {
             <div key={m.texto}>
               <button
                 onClick={() => {
-                 setProduccionAbierta(true)
-                 navigate('/produccion')
-  }}
+                  setProduccionAbierta(true)
+                  navigate('/produccion')
+                }}
                 className={`w-full ${claseItem(activo && !produccionAbierta)}`}
               >
                 <Icono className="w-5 h-5" />
