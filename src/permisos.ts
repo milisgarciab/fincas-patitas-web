@@ -12,8 +12,9 @@ export type Permiso =
   | 'animales.editar' // editar y eliminar animales
   | 'insumos.crear' // crear insumos del catálogo
   | 'stock.entrada' // entradas de stock (para cuando exista la pantalla)
-  | 'registros.eliminar' // eliminar registros (el Empleado solo edita)
-  | 'usuarios.ver' // lista de usuarios (para cuando exista la pantalla)
+  | 'registros.editar' // editar registros (los tres roles; el Empleado solo edita)
+  | 'registros.eliminar' // eliminar registros (el Empleado no)
+  | 'usuarios.ver' // lista de usuarios
   | 'usuarios.gestionar' // crear, cambiar rol y activar/desactivar usuarios
   | 'ubicacion.editar' // cambiar la ubicación de la finca en el mapa
 
@@ -25,6 +26,7 @@ const PERMISOS: Record<Permiso, number[]> = {
   'animales.editar': [1, 2],
   'insumos.crear': [1],
   'stock.entrada': [1, 2],
+  'registros.editar': [1, 2, 3],
   'registros.eliminar': [1, 2],
   'usuarios.ver': [1, 2],
   'usuarios.gestionar': [1],
