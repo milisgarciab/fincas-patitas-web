@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import SelectorAnimal from '../components/SelectorAnimal'
 
 interface Especie {
   id: number
@@ -13,7 +14,7 @@ interface Raza {
   nombre: string
 }
 
-// Ruta del backend que lista las razas (verifícala en Swagger)
+// Ruta del backend que lista las razas
 const RUTA_RAZAS = '/razas'
 
 export default function CrearAnimal() {
@@ -59,29 +60,24 @@ export default function CrearAnimal() {
       })
       navigate(`/animales/${data.id}`)
     } catch (err: any) {
-      setError(
-        err.response?.data?.error?.message ?? 'No se pudo crear el animal',
-      )
+      setError(err.response?.data?.error?.message ?? 'No se pudo crear el animal')
     } finally {
       setGuardando(false)
     }
   }
 
   const campo =
-    'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600'
+    'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-bosque/40'
 
   return (
-    <div className="min-h-screen bg-green-50 p-6">
+    <div className="p-4 sm:p-6">
       <div className="max-w-xl mx-auto">
-        <Link to="/animales" className="text-green-700 hover:underline">
+        <Link to="/animales" className="text-bosque hover:underline">
           ← Volver a animales
         </Link>
 
-        <form
-          onSubmit={guardar}
-          className="mt-4 bg-white rounded-xl shadow p-6 space-y-4"
-        >
-          <h1 className="text-2xl font-bold text-green-800">Nuevo animal</h1>
+        <form onSubmit={guardar} className="mt-4 bg-white rounded-xl shadow p-6 space-y-4">
+          <h1 className="text-2xl font-bold text-bosque-oscuro">Nuevo animal</h1>
 
           <div>
             <label className="block text-sm text-gray-600 mb-1">Nombre</label>
@@ -95,20 +91,14 @@ export default function CrearAnimal() {
 
           <div>
             <label className="block text-sm text-gray-600 mb-1">Género</label>
-            <select
-              value={genero}
-              onChange={(e) => setGenero(e.target.value)}
-              className={campo}
-            >
+            <select value={genero} onChange={(e) => setGenero(e.target.value)} className={campo}>
               <option value="Macho">Macho</option>
               <option value="Hembra">Hembra</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              Fecha de nacimiento
-            </label>
+            <label className="block text-sm text-gray-600 mb-1">Fecha de nacimiento</label>
             <input
               type="date"
               value={fechaNacimiento}
@@ -157,39 +147,28 @@ export default function CrearAnimal() {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                ID de la madre (opcional)
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={madreId}
-                onChange={(e) => setMadreId(e.target.value)}
-                className={campo}
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                ID del padre (opcional)
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={padreId}
-                onChange={(e) => setPadreId(e.target.value)}
-                className={campo}
-              />
-            </div>
-          </div>
+          <SelectorAnimal
+            etiqueta="Madre (opcional)"
+            valor={madreId}
+            onCambio={setMadreId}
+            genero="Hembra"
+            textoVacio="Sin madre registrada"
+          />
+
+          <SelectorAnimal
+            etiqueta="Padre (opcional)"
+            valor={padreId}
+            onCambio={setPadreId}
+            genero="Macho"
+            textoVacio="Sin padre registrado"
+          />
 
           {error && <p className="text-red-600 text-sm">{error}</p>}
 
           <button
             type="submit"
             disabled={guardando}
-            className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold rounded-lg py-2 disabled:opacity-50"
+            className="w-full bg-bosque hover:bg-bosque-oscuro text-white font-semibold rounded-lg py-2 disabled:opacity-50"
           >
             {guardando ? 'Guardando...' : 'Crear animal'}
           </button>

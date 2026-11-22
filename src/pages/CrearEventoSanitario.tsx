@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import { hoyLocal } from '../fechas'
+import SelectorAnimal from '../components/SelectorAnimal'
 
 // Solo "Vacunación" está confirmado en Swagger; los demás son suposición
 const TIPOS = ['Vacunación', 'Tratamiento', 'Enfermedad', 'Desparasitación']
@@ -11,7 +13,7 @@ export default function CrearEventoSanitario() {
   const [tipo, setTipo] = useState('Vacunación')
   const [dosis, setDosis] = useState('')
   const [descripcion, setDescripcion] = useState('')
-  const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10))
+  const [fecha, setFecha] = useState(hoyLocal())
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
 
@@ -36,44 +38,23 @@ export default function CrearEventoSanitario() {
   }
 
   const campo =
-    'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600'
+    'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-bosque/40'
 
   return (
-    <div className="min-h-screen bg-green-50 p-6">
+    <div className="p-4 sm:p-6">
       <div className="max-w-xl mx-auto">
-        <Link to="/salud" className="text-green-700 hover:underline">
+        <Link to="/salud" className="text-bosque hover:underline">
           ← Volver a salud animal
         </Link>
 
-        <form
-          onSubmit={guardar}
-          className="mt-4 bg-white rounded-xl shadow p-6 space-y-4"
-        >
-          <h1 className="text-2xl font-bold text-green-800">Nuevo evento sanitario</h1>
+        <form onSubmit={guardar} className="mt-4 bg-white rounded-xl shadow p-6 space-y-4">
+          <h1 className="text-2xl font-bold text-bosque-oscuro">Nuevo evento sanitario</h1>
 
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">ID del animal</label>
-            <input
-              type="number"
-              min="1"
-              value={animalId}
-              onChange={(e) => setAnimalId(e.target.value)}
-              required
-              className={campo}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              El ID está en la dirección del detalle del animal (por ejemplo
-              /animales/41).
-            </p>
-          </div>
+          <SelectorAnimal etiqueta="Animal" valor={animalId} onCambio={setAnimalId} requerido />
 
           <div>
             <label className="block text-sm text-gray-600 mb-1">Tipo de evento</label>
-            <select
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}
-              className={campo}
-            >
+            <select value={tipo} onChange={(e) => setTipo(e.target.value)} className={campo}>
               {TIPOS.map((t) => (
                 <option key={t} value={t}>
                   {t}
@@ -83,9 +64,7 @@ export default function CrearEventoSanitario() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              Dosis aplicada (opcional)
-            </label>
+            <label className="block text-sm text-gray-600 mb-1">Dosis aplicada (opcional)</label>
             <input
               type="number"
               min="0"
@@ -124,7 +103,7 @@ export default function CrearEventoSanitario() {
           <button
             type="submit"
             disabled={guardando}
-            className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold rounded-lg py-2 disabled:opacity-50"
+            className="w-full bg-bosque hover:bg-bosque-oscuro text-white font-semibold rounded-lg py-2 disabled:opacity-50"
           >
             {guardando ? 'Guardando...' : 'Guardar evento'}
           </button>

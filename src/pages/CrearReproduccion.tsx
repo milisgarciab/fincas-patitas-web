@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import { hoyLocal } from '../fechas'
+import SelectorAnimal from '../components/SelectorAnimal'
 
 export default function CrearReproduccion() {
   const navigate = useNavigate()
-  const hoy = new Date().toISOString().slice(0, 10)
 
   const [animalId, setAnimalId] = useState('')
   const [machoId, setMachoId] = useState('')
   const [tipo, setTipo] = useState('IA')
-  const [fechaInseminacion, setFechaInseminacion] = useState(hoy)
+  const [fechaInseminacion, setFechaInseminacion] = useState(hoyLocal())
   const [fechaParto, setFechaParto] = useState('')
   const [notas, setNotas] = useState('')
   const [error, setError] = useState('')
@@ -37,49 +38,33 @@ export default function CrearReproduccion() {
   }
 
   const campo =
-    'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600'
+    'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-bosque/40'
 
   return (
-    <div className="min-h-screen bg-green-50 p-6">
+    <div className="p-4 sm:p-6">
       <div className="max-w-xl mx-auto">
-        <Link to="/reproduccion" className="text-green-700 hover:underline">
+        <Link to="/reproduccion" className="text-bosque hover:underline">
           ← Volver a reproducción
         </Link>
 
-        <form
-          onSubmit={guardar}
-          className="mt-4 bg-white rounded-xl shadow p-6 space-y-4"
-        >
-          <h1 className="text-2xl font-bold text-green-800">Nueva gestación</h1>
+        <form onSubmit={guardar} className="mt-4 bg-white rounded-xl shadow p-6 space-y-4">
+          <h1 className="text-2xl font-bold text-bosque-oscuro">Nueva gestación</h1>
 
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">ID de la hembra</label>
-            <input
-              type="number"
-              min="1"
-              value={animalId}
-              onChange={(e) => setAnimalId(e.target.value)}
-              required
-              className={campo}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              El ID está en la dirección del detalle del animal (por ejemplo
-              /animales/41).
-            </p>
-          </div>
+          <SelectorAnimal
+            etiqueta="Hembra"
+            valor={animalId}
+            onCambio={setAnimalId}
+            genero="Hembra"
+            requerido
+          />
 
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              ID del macho (opcional)
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={machoId}
-              onChange={(e) => setMachoId(e.target.value)}
-              className={campo}
-            />
-          </div>
+          <SelectorAnimal
+            etiqueta="Macho (opcional)"
+            valor={machoId}
+            onCambio={setMachoId}
+            genero="Macho"
+            textoVacio="Sin macho registrado"
+          />
 
           <div>
             <label className="block text-sm text-gray-600 mb-1">Tipo</label>
@@ -129,7 +114,7 @@ export default function CrearReproduccion() {
           <button
             type="submit"
             disabled={guardando}
-            className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold rounded-lg py-2 disabled:opacity-50"
+            className="w-full bg-bosque hover:bg-bosque-oscuro text-white font-semibold rounded-lg py-2 disabled:opacity-50"
           >
             {guardando ? 'Guardando...' : 'Registrar gestación'}
           </button>
