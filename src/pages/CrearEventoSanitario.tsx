@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { hoyLocal } from '../fechas'
 import SelectorAnimal from '../components/SelectorAnimal'
@@ -9,13 +9,18 @@ const TIPOS = ['Vacunación', 'Tratamiento', 'Enfermedad', 'Desparasitación']
 
 export default function CrearEventoSanitario() {
   const navigate = useNavigate()
-  const [animalId, setAnimalId] = useState('')
+  const [params] = useSearchParams()
+  const animalDeOrigen = params.get('animal') ?? ''
+
+  const [animalId, setAnimalId] = useState(animalDeOrigen)
   const [tipo, setTipo] = useState('Vacunación')
   const [dosis, setDosis] = useState('')
   const [descripcion, setDescripcion] = useState('')
   const [fecha, setFecha] = useState(hoyLocal())
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
+
+  const volverA = animalDeOrigen ? `/animales/${animalDeOrigen}` : '/salud'
 
   const guardar = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,7 +34,7 @@ export default function CrearEventoSanitario() {
         descripcion_tratamiento: descripcion || undefined,
         fecha_evento: fecha,
       })
-      navigate('/salud')
+      navigate(volverA)
     } catch (err: any) {
       setError(err.response?.data?.error?.message ?? 'No se pudo guardar el evento')
     } finally {
@@ -43,8 +48,8 @@ export default function CrearEventoSanitario() {
   return (
     <div className="p-4 sm:p-6">
       <div className="max-w-xl mx-auto">
-        <Link to="/salud" className="text-bosque hover:underline">
-          ← Volver a salud animal
+        <Link to={volverA} className="text-bosque hover:underline">
+          ← Volver
         </Link>
 
         <form onSubmit={guardar} className="mt-4 bg-white rounded-xl shadow p-6 space-y-4">
