@@ -10,6 +10,7 @@ export type Permiso =
   | 'finanzas.editar' // gastos, ventas y generar balance
   | 'precios.configurar' // precios de mercado
   | 'animales.editar' // editar y eliminar animales
+  | 'animales.trasladar' // mover un animal a otro potrero
   | 'insumos.crear' // crear insumos del catálogo
   | 'stock.entrada' // entradas de stock (para cuando exista la pantalla)
   | 'registros.editar' // editar registros (los tres roles; el Empleado solo edita)
@@ -24,6 +25,7 @@ const PERMISOS: Record<Permiso, number[]> = {
   'finanzas.editar': [1],
   'precios.configurar': [1, 2],
   'animales.editar': [1, 2],
+  'animales.trasladar': [1, 2],
   'insumos.crear': [1],
   'stock.entrada': [1, 2],
   'registros.editar': [1, 2, 3],
