@@ -12,14 +12,15 @@ export type Permiso =
   | 'animales.editar' // editar y eliminar animales
   | 'animales.trasladar' // mover un animal a otro potrero
   | 'insumos.crear' // crear insumos del catálogo
-  | 'stock.entrada' // entradas de stock (para cuando exista la pantalla)
+  | 'stock.entrada' // entradas de stock (la salida la pueden hacer los tres roles)
   | 'registros.editar' // editar registros (los tres roles; el Empleado solo edita)
   | 'registros.eliminar' // eliminar registros (el Empleado no)
-  | 'usuarios.ver' // lista de usuarios
-  | 'usuarios.gestionar' // crear, cambiar rol y activar/desactivar usuarios
+  | 'usuarios.ver' // lista de usuarios (el backend solo la entrega al Administrador)
+  | 'usuarios.gestionar' // crear, cambiar rol, activar/desactivar, restablecer contraseña
+  | 'auditoria.ver' // registro de auditoría (solo Administrador en el backend)
   | 'ubicacion.editar' // cambiar la ubicación de la finca en el mapa
 
-// Qué roles tienen cada permiso (según la matriz de permisos)
+// Qué roles tienen cada permiso (según la matriz y lo que permite el backend)
 const PERMISOS: Record<Permiso, number[]> = {
   'finanzas.ver': [1, 2],
   'finanzas.editar': [1],
@@ -30,8 +31,9 @@ const PERMISOS: Record<Permiso, number[]> = {
   'stock.entrada': [1, 2],
   'registros.editar': [1, 2, 3],
   'registros.eliminar': [1, 2],
-  'usuarios.ver': [1, 2],
+  'usuarios.ver': [1],
   'usuarios.gestionar': [1],
+  'auditoria.ver': [1],
   'ubicacion.editar': [1, 2],
 }
 

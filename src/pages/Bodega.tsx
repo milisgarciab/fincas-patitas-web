@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Pencil, Trash2 } from 'lucide-react'
+import { ArrowRightLeft, History, Pencil, Trash2 } from 'lucide-react'
 import { api } from '../api'
+import { hoyLocal } from '../fechas'
 import { puede } from '../permisos'
 import Modal from '../components/Modal'
 
@@ -21,6 +22,14 @@ interface Categoria {
   nombre: string
 }
 
+interface Movimiento {
+  id: number
+  tipo: string
+  cantidad: string
+  motivo: string | null
+  fecha: string
+}
+
 // Unidades que ya usa tu inventario
 const UNIDADES = ['Unidad', 'Bulto', 'Kg', 'Ltr', 'ml', 'Dosis', 'Arroba']
 
@@ -30,6 +39,7 @@ const campo =
 export default function Bodega() {
   const puedeEditar = puede('registros.editar')
   const puedeEliminar = puede('registros.eliminar')
+  const puedeEntrada = puede('stock.entrada')
 
   const [insumos, setInsumos] = useState<Insumo[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -39,12 +49,25 @@ export default function Bodega() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
+  // Edición
   const [editando, setEditando] = useState<Insumo | null>(null)
   const [nombre, setNombre] = useState('')
   const [categoriaEdit, setCategoriaEdit] = useState('')
   const [unidad, setUnidad] = useState('Unidad')
   const [guardando, setGuardando] = useState(false)
   const [errorEdicion, setErrorEdicion] = useState('')
+
+  // Movimiento de stock
+  const [moviendo, setMoviendo] = useState<Insumo | null>(null)
+  const [tipoMov, setTipoMov] = useState<'Entrada' | 'Salida'>('Salida')
+  const [cantidadMov, setCantidadMov] = useState('')
+  const [motivoMov, setMotivoMov] = useState('Consumo')
+  const [fechaMov, setFechaMov] = useState(hoyLocal())
+  const [errorMov, setErrorMov] = useState('')
+
+  // Historial
+  const [historial, setHistorial] = useState<Insumo | null>(null)
+  const [movimientos, setMovimientos] = useState<Movimiento[] | null>(null)
 
   const cargar = () =>
     Promise.all([api.get('/bodega'), api.get('/categorias-bodega')])
@@ -66,6 +89,7 @@ export default function Bodega() {
 
   const totalBajo = insumos.filter((i) => i.stock_bajo).length
 
+  // ---------- Editar ----------
   const abrirEdicion = (i: Insumo) => {
     setNombre(i.nombre)
     setCategoriaEdit(String(i.categorias_bodega.id))
@@ -108,6 +132,57 @@ export default function Bodega() {
     } catch (err: any) {
       setError(err.response?.data?.error?.message ?? 'No se pudo eliminar el insumo')
     }
+  }
+
+  // ---------- Movimiento de stock ----------
+  const MOTIVOS: Record<'Entrada' | 'Salida', string[]> = {
+    Entrada: ['Compra'],
+    Salida: ['Consumo', 'Merma'],
+  }
+
+  const abrirMovimiento = (i: Insumo) => {
+    setTipoMov('Salida')
+    setMotivoMov('Consumo')
+    setCantidadMov('')
+    setFechaMov(hoyLocal())
+    setErrorMov('')
+    setMoviendo(i)
+  }
+
+  const cambiarTipo = (t: 'Entrada' | 'Salida') => {
+    setTipoMov(t)
+    setMotivoMov(MOTIVOS[t][0])
+  }
+
+  const guardarMovimiento = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!moviendo) return
+    setErrorMov('')
+    setGuardando(true)
+    try {
+      await api.post(`/bodega/${moviendo.id}/movimientos`, {
+        tipo: tipoMov,
+        cantidad: Number(cantidadMov),
+        motivo: motivoMov,
+        fecha: fechaMov,
+      })
+      setMoviendo(null)
+      await cargar()
+    } catch (err: any) {
+      setErrorMov(err.response?.data?.error?.message ?? 'No se pudo registrar el movimiento')
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  // ---------- Historial ----------
+  const abrirHistorial = (i: Insumo) => {
+    setHistorial(i)
+    setMovimientos(null)
+    api
+      .get('/movimientos-inventario', { params: { insumo_id: i.id } })
+      .then((r) => setMovimientos(Array.isArray(r.data) ? r.data : (r.data?.data ?? [])))
+      .catch(() => setMovimientos([]))
   }
 
   const botonIcono = 'p-1.5 rounded-lg hover:bg-black/5'
@@ -182,7 +257,7 @@ export default function Bodega() {
                 <th className="px-4 py-2">Stock</th>
                 <th className="px-4 py-2">Mínimo</th>
                 <th className="px-4 py-2">Estado</th>
-                {puedeEditar && <th className="px-4 py-2 text-right">Acciones</th>}
+                <th className="px-4 py-2 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -212,17 +287,29 @@ export default function Bodega() {
                     <td className="px-4 py-2">
                       <span
                         className={`px-2 py-0.5 rounded-full text-sm ${
-                          i.stock_bajo
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-menta text-bosque-oscuro'
+                          i.stock_bajo ? 'bg-red-100 text-red-700' : 'bg-menta text-bosque-oscuro'
                         }`}
                       >
                         {i.stock_bajo ? 'Stock bajo' : 'OK'}
                       </span>
                     </td>
-                    {puedeEditar && (
-                      <td className="px-4 py-2">
-                        <div className="flex justify-end gap-1">
+                    <td className="px-4 py-2">
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => abrirMovimiento(i)}
+                          title="Registrar entrada o salida"
+                          className={`${botonIcono} text-bosque`}
+                        >
+                          <ArrowRightLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => abrirHistorial(i)}
+                          title="Historial de movimientos"
+                          className={`${botonIcono} text-gray-600`}
+                        >
+                          <History className="w-4 h-4" />
+                        </button>
+                        {puedeEditar && (
                           <button
                             onClick={() => abrirEdicion(i)}
                             title="Editar"
@@ -230,18 +317,18 @@ export default function Bodega() {
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
-                          {puedeEliminar && (
-                            <button
-                              onClick={() => eliminar(i)}
-                              title="Eliminar"
-                              className={`${botonIcono} text-red-600`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    )}
+                        )}
+                        {puedeEliminar && (
+                          <button
+                            onClick={() => eliminar(i)}
+                            title="Eliminar"
+                            className={`${botonIcono} text-red-600`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
@@ -313,6 +400,123 @@ export default function Bodega() {
               </button>
             </div>
           </form>
+        </Modal>
+      )}
+
+      {moviendo && (
+        <Modal titulo={`Movimiento de stock: ${moviendo.nombre}`} onCerrar={() => setMoviendo(null)}>
+          <form onSubmit={guardarMovimiento} className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Stock actual: {Number(moviendo.stock_actual)} {moviendo.unidad_medida}
+            </p>
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Tipo</label>
+              <select
+                value={tipoMov}
+                onChange={(e) => cambiarTipo(e.target.value as 'Entrada' | 'Salida')}
+                className={campo}
+              >
+                {puedeEntrada && <option value="Entrada">Entrada (compra)</option>}
+                <option value="Salida">Salida (consumo o merma)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Motivo</label>
+              <select
+                value={motivoMov}
+                onChange={(e) => setMotivoMov(e.target.value)}
+                className={campo}
+              >
+                {MOTIVOS[tipoMov].map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                Cantidad ({moviendo.unidad_medida})
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="any"
+                value={cantidadMov}
+                onChange={(e) => setCantidadMov(e.target.value)}
+                required
+                className={campo}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Fecha</label>
+              <input
+                type="date"
+                value={fechaMov}
+                onChange={(e) => setFechaMov(e.target.value)}
+                required
+                className={campo}
+              />
+            </div>
+
+            {errorMov && <p className="text-red-600 text-sm">{errorMov}</p>}
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setMoviendo(null)}
+                className="flex-1 border border-gray-300 rounded-lg py-2"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={guardando}
+                className="flex-1 bg-bosque hover:bg-bosque-oscuro text-white font-semibold rounded-lg py-2 disabled:opacity-50"
+              >
+                {guardando ? 'Guardando...' : 'Registrar'}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {historial && (
+        <Modal titulo={`Historial: ${historial.nombre}`} onCerrar={() => setHistorial(null)}>
+          {movimientos === null ? (
+            <p className="text-sm text-gray-500">Cargando...</p>
+          ) : movimientos.length === 0 ? (
+            <p className="text-sm text-gray-500">Este insumo todavía no tiene movimientos.</p>
+          ) : (
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="text-gray-500">
+                  <th className="py-1 pr-3">Fecha</th>
+                  <th className="py-1 pr-3">Tipo</th>
+                  <th className="py-1 pr-3">Cantidad</th>
+                  <th className="py-1">Motivo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...movimientos]
+                  .sort((a, b) => b.fecha.localeCompare(a.fecha))
+                  .map((m) => (
+                    <tr key={m.id} className="border-t border-gray-100">
+                      <td className="py-1 pr-3">
+                        {new Date(m.fecha).toLocaleDateString('es-CO')}
+                      </td>
+                      <td className="py-1 pr-3">{m.tipo}</td>
+                      <td className="py-1 pr-3">{Number(m.cantidad)}</td>
+                      <td className="py-1">{m.motivo ?? '—'}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          )}
         </Modal>
       )}
     </div>

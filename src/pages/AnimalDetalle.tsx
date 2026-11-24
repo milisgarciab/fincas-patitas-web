@@ -149,6 +149,7 @@ export default function AnimalDetalle() {
       obtenerLista<any>(['/produccion-leche']),
       obtenerLista<any>(['/produccion-huevos', '/produccion/huevos']),
       api.get(`/animales/${id}/movimientos`),
+      api.get('/ubicaciones-potreros')
     ])
 
     if (a.status === 'fulfilled') {
