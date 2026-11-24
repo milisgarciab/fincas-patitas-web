@@ -14,6 +14,7 @@ import {
   PawPrint,
   Search,
   User,
+  ClipboardList,
   Users,
   Wallet,
   X,
@@ -56,6 +57,7 @@ const MENU: Opcion[] = [
   { texto: 'Ubicación', icono: MapPin, ruta: '/ubicacion' },
   { texto: 'Finanzas', icono: Wallet, ruta: '/finanzas', permiso: 'finanzas.ver' },
   { texto: 'Usuarios', icono: Users, ruta: '/usuarios', permiso: 'usuarios.ver' },
+  { texto: 'Auditoría', icono: ClipboardList, ruta: '/auditoria', permiso: 'auditoria.ver' },
 ]
 
 export default function Layout() {
