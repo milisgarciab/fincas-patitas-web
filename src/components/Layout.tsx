@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   Baby,
-  Bell,
   ChevronDown,
   ChevronUp,
   HeartPulse,
@@ -14,6 +13,7 @@ import {
   Package,
   PawPrint,
   Search,
+  User,
   Users,
   Wallet,
   X,
@@ -23,6 +23,7 @@ import { NOMBRE_ROL, puede, rolActual } from '../permisos'
 import type { Permiso } from '../permisos'
 import { limpiarSesion } from '../sesion'
 import ToggleTema from './ToggleTema'
+import Notificaciones from './Notificaciones'
 
 interface Item {
   texto: string
@@ -211,9 +212,7 @@ export default function Layout() {
           <div className="ml-auto flex items-center gap-3">
             <ToggleTema />
 
-            <button className="p-2 rounded-lg text-marron hover:bg-black/5" title="Notificaciones">
-              <Bell className="w-5 h-5" />
-            </button>
+            <Notificaciones />
 
             <div className="relative">
               <button
@@ -235,7 +234,14 @@ export default function Layout() {
               {menuUsuario && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setMenuUsuario(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-44 bg-white rounded-lg shadow-lg py-1 z-40">
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-40">
+                    <Link
+                      to="/perfil"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-crema"
+                    >
+                      <User className="w-4 h-4" />
+                      Mi perfil
+                    </Link>
                     <button
                       onClick={salir}
                       className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-crema"

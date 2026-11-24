@@ -21,6 +21,7 @@ import Finanzas from './pages/Finanzas'
 import MercadoBalance from './pages/MercadoBalance'
 import Usuarios from './pages/Usuarios'
 import Ubicacion from './pages/Ubicacion'
+import Perfil from './pages/Perfil'
 import { puede } from './permisos'
 import type { Permiso } from './permisos'
 
@@ -54,6 +55,7 @@ export default function App() {
           }
         >
           <Route path="/inicio" element={<Inicio />} />
+          <Route path="/perfil" element={<Perfil />} />
           <Route path="/ubicacion" element={<Ubicacion />} />
 
           <Route path="/animales" element={<Animales />} />
