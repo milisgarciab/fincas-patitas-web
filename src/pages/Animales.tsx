@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { api } from '../api'
+import { cargarAnimales } from '../animalesLista'
 
 interface Animal {
   id: number
   codigo: string
-  nombre: string
+  nombre: string | null
   genero: string
-  estado: string
+  estado: string | null
   fecha_nacimiento: string | null
   especies: { nombre: string } | null
   razas: { nombre: string } | null
@@ -21,14 +21,14 @@ export default function Animales() {
 
   const [animales, setAnimales] = useState<Animal[]>([])
   const [texto, setTexto] = useState(q)
+  const [estadoFiltro, setEstadoFiltro] = useState('Activo')
   const [pagina, setPagina] = useState(1)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    api
-      .get('/animales', { params: { pagina: 1, limite: 100 } })
-      .then((r) => setAnimales(Array.isArray(r.data) ? r.data : r.data.data))
+    cargarAnimales<Animal>('Todos')
+      .then(setAnimales)
       .catch(() => setError('No se pudieron cargar los animales'))
       .finally(() => setCargando(false))
   }, [])
@@ -45,21 +45,29 @@ export default function Animales() {
     setParams(valor ? { q: valor } : {}, { replace: true })
   }
 
+  // Estados que existen en los datos, con Activo siempre disponible
+  const estados = [
+    ...new Set(['Activo', ...animales.map((a) => a.estado).filter(Boolean)]),
+  ] as string[]
+
   const busqueda = texto.trim().toLowerCase()
-  const filtrados = animales.filter(
-    (a) =>
-      !busqueda ||
-      a.nombre.toLowerCase().includes(busqueda) ||
-      a.codigo.toLowerCase().includes(busqueda) ||
-      a.especies?.nombre.toLowerCase().includes(busqueda) ||
-      a.razas?.nombre.toLowerCase().includes(busqueda),
-  )
+  const filtrados = animales
+    .filter((a) => estadoFiltro === 'Todos' || a.estado === estadoFiltro)
+    .filter(
+      (a) =>
+        !busqueda ||
+        (a.nombre ?? '').toLowerCase().includes(busqueda) ||
+        a.codigo.toLowerCase().includes(busqueda) ||
+        a.especies?.nombre.toLowerCase().includes(busqueda) ||
+        a.razas?.nombre.toLowerCase().includes(busqueda),
+    )
 
   const totalPaginas = Math.max(Math.ceil(filtrados.length / POR_PAGINA), 1)
   const paginaActual = Math.min(pagina, totalPaginas)
   const visibles = filtrados.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA)
 
-  const fecha = (f: string | null) => (f ? new Date(f).toLocaleDateString('es-CO') : '—')
+  const fecha = (f: string | null) =>
+    f ? new Date(f).toLocaleDateString('es-CO', { timeZone: 'UTC' }) : '—'
 
   return (
     <div className="p-4 sm:p-6">
@@ -74,13 +82,30 @@ export default function Animales() {
           </Link>
         </div>
 
-        <input
-          type="text"
-          placeholder="Buscar por nombre, código, especie o raza..."
-          value={texto}
-          onChange={(e) => cambiarTexto(e.target.value)}
-          className="w-full mb-4 border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-bosque/40"
-        />
+        <div className="flex flex-wrap gap-3 mb-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre, código, especie o raza..."
+            value={texto}
+            onChange={(e) => cambiarTexto(e.target.value)}
+            className="flex-1 min-w-48 border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-bosque/40"
+          />
+          <select
+            value={estadoFiltro}
+            onChange={(e) => {
+              setEstadoFiltro(e.target.value)
+              setPagina(1)
+            }}
+            className="border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-bosque/40"
+          >
+            {estados.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+            <option value="Todos">Todos los estados</option>
+          </select>
+        </div>
 
         {error && <p className="text-red-600 mb-3">{error}</p>}
 
@@ -120,7 +145,7 @@ export default function Animales() {
                     </td>
                     <td className="px-4 py-2">
                       <Link to={`/animales/${a.id}`} className="hover:underline">
-                        {a.nombre}
+                        {a.nombre ?? 'Sin nombre'}
                       </Link>
                     </td>
                     <td className="px-4 py-2">{a.especies?.nombre}</td>

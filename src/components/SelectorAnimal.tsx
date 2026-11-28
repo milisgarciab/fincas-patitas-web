@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { api } from '../api'
+import { cargarAnimales } from '../animalesLista'
 
 interface AnimalOpcion {
   id: number
   codigo: string
-  nombre: string
+  nombre: string | null
   genero: string
+  estado: string | null
   especies: { nombre: string } | null
 }
 
@@ -36,28 +37,30 @@ export default function SelectorAnimal({
   const [texto, setTexto] = useState('')
 
   useEffect(() => {
-    api
-      .get('/animales', { params: { pagina: 1, limite: 100 } })
-      .then((r) => {
-        setAnimales(Array.isArray(r.data) ? r.data : r.data.data)
+    cargarAnimales<AnimalOpcion>('Todos')
+      .then((lista) => {
+        setAnimales(lista)
         setEstado('listo')
       })
       .catch(() => setEstado('error'))
   }, [])
 
   const etiquetaAnimal = (a: AnimalOpcion) =>
-    `${a.nombre} (${a.codigo})${a.especies ? ` · ${a.especies.nombre}` : ''}`
+    `${a.nombre ?? 'Sin nombre'} (${a.codigo})${a.especies ? ` · ${a.especies.nombre}` : ''}${
+      a.estado && a.estado !== 'Activo' ? ` · ${a.estado}` : ''
+    }`
 
   const opciones = useMemo(() => {
     const q = texto.trim().toLowerCase()
     const lista = animales
+      .filter((a) => a.estado === 'Activo' || String(a.id) === valor)
       .filter((a) => !genero || a.genero === genero)
       .filter((a) => a.id !== excluirId)
       .filter(
         (a) =>
-          !q || a.nombre.toLowerCase().includes(q) || a.codigo.toLowerCase().includes(q),
+          !q || (a.nombre ?? '').toLowerCase().includes(q) || a.codigo.toLowerCase().includes(q),
       )
-      .sort((a, b) => a.nombre.localeCompare(b.nombre))
+      .sort((a, b) => (a.nombre ?? '').localeCompare(b.nombre ?? ''))
 
     // El animal ya elegido siempre se ve, aunque el buscador no lo incluya
     const elegido = animales.find((a) => String(a.id) === valor)

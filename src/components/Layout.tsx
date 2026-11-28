@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
-  Baby,
+  Dna,
   ChevronDown,
   HeartPulse,
    Home,
@@ -51,7 +51,7 @@ const MENU: Opcion[] = [
   },
   { texto: 'Inventario', icono: Package, ruta: '/inventario', rutas: ['/inventario', '/bodega'] },
   { texto: 'Salud', icono: HeartPulse, ruta: '/salud', rutas: ['/salud'] },
-  { texto: 'Reproducción', icono: Baby, ruta: '/reproduccion', rutas: ['/reproduccion'] },
+  { texto: 'Reproducción', icono: Dna, ruta: '/reproduccion', rutas: ['/reproduccion'] },
   {
     texto: 'Finanzas',
     icono: Wallet,
