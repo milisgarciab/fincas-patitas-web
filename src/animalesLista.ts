@@ -17,8 +17,8 @@ export interface AnimalResumen {
 export const aLista = (d: any): any[] => (Array.isArray(d) ? d : (d?.data ?? []))
 
 // Trae todas las páginas (el backend entrega máximo 100 por página)
-export async function cargarAnimales(estado = 'Todos'): Promise<AnimalResumen[]> {
-  const todos: AnimalResumen[] = []
+export async function cargarAnimales<T = AnimalResumen>(estado = 'Todos'): Promise<T[]> {
+  const todos: T[] = []
   let pagina = 1
   let total = 1
   while (pagina <= total && pagina <= 20) {

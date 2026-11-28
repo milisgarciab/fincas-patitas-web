@@ -1,10 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import { aLista } from '../animalesLista'
 import SelectorAnimal from '../components/SelectorAnimal'
 
 interface Props {
   tipo: 'leche' | 'huevos'
+}
+
+interface Lote {
+  id: number
+  nombre: string
+  especie_id: number | null
+  especies?: { nombre: string } | null
 }
 
 export default function RegistrarProduccion({ tipo }: Props) {
@@ -14,6 +22,8 @@ export default function RegistrarProduccion({ tipo }: Props) {
   const [paraQuien, setParaQuien] = useState<'animal' | 'lote'>('animal')
   const [animalId, setAnimalId] = useState('')
   const [loteId, setLoteId] = useState('')
+  const [lotes, setLotes] = useState<Lote[]>([])
+  const [especies, setEspecies] = useState<{ id: number; nombre: string }[]>([])
   const [litros, setLitros] = useState('')
   const [cantidad, setCantidad] = useState('')
   const [rotos, setRotos] = useState('0')
@@ -23,6 +33,20 @@ export default function RegistrarProduccion({ tipo }: Props) {
 
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
+
+  useEffect(() => {
+    api
+      .get('/lotes-animales')
+      .then((r) => setLotes(aLista(r.data)))
+      .catch(() => setLotes([]))
+    api
+      .get('/especies')
+      .then((r) => setEspecies(aLista(r.data)))
+      .catch(() => setEspecies([]))
+  }, [])
+
+  const especieDe = (l: Lote) =>
+    l.especies?.nombre ?? especies.find((s) => s.id === l.especie_id)?.nombre ?? ''
 
   const guardar = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -91,15 +115,26 @@ export default function RegistrarProduccion({ tipo }: Props) {
             />
           ) : (
             <div>
-              <label className="block text-sm text-gray-600 mb-1">Número del lote</label>
-              <input
-                type="number"
-                min="1"
+              <label className="block text-sm text-gray-600 mb-1">Lote</label>
+              <select
                 value={loteId}
                 onChange={(e) => setLoteId(e.target.value)}
                 required
                 className={campo}
-              />
+              >
+                <option value="">Selecciona un lote</option>
+                {lotes.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.nombre}
+                    {especieDe(l) ? ` · ${especieDe(l)}` : ''}
+                  </option>
+                ))}
+              </select>
+              {lotes.length === 0 && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Todavía no hay lotes. Créalos en Ubicación → Lotes.
+                </p>
+              )}
             </div>
           )}
 

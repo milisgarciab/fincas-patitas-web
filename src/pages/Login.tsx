@@ -124,14 +124,9 @@ export default function Login() {
                 />
                 Recordarme
               </label>
-              <button
-                type="button"
-                disabled
-                title="Próximamente"
-                className="text-bosque disabled:opacity-60"
-              >
+              <Link to="/recuperar" className="text-bosque hover:underline">
                 ¿Olvidaste tu contraseña?
-              </button>
+              </Link>
             </div>
 
             {error && <p className="text-red-600 text-sm">{error}</p>}
