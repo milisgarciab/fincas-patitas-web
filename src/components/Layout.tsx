@@ -16,7 +16,11 @@ import {
   User,
   ClipboardList,
   Users,
+  Layers,
+  Scale,
+  Trees,
   Wallet,
+  Wheat,
   X,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -55,6 +59,10 @@ const MENU: Opcion[] = [
   { texto: 'Salud', icono: HeartPulse, ruta: '/salud' },
   { texto: 'Reproducción', icono: Baby, ruta: '/reproduccion' },
   { texto: 'Ubicación', icono: MapPin, ruta: '/ubicacion' },
+  { texto: 'Potreros', icono: Trees, ruta: '/potreros' },
+  { texto: 'Lotes', icono: Layers, ruta: '/lotes' },
+  { texto: 'Alimentación', icono: Wheat, ruta: '/alimentacion' },
+  { texto: 'Peso', icono: Scale, ruta: '/pesos' },
   { texto: 'Finanzas', icono: Wallet, ruta: '/finanzas', permiso: 'finanzas.ver' },
   { texto: 'Usuarios', icono: Users, ruta: '/usuarios', permiso: 'usuarios.ver' },
   { texto: 'Auditoría', icono: ClipboardList, ruta: '/auditoria', permiso: 'auditoria.ver' },

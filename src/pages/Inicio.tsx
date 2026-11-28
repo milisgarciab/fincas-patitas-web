@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import ResumenProduccion from '../components/ResumenProduccion'
 import {
   ArrowRight,
   Milk,
@@ -12,6 +13,7 @@ import { api } from '../api'
 
 interface Animal {
   especies: { nombre: string } | null
+  
 }
 
 interface Insumo {
@@ -71,6 +73,7 @@ export default function Inicio() {
   const user = JSON.parse(localStorage.getItem('user') ?? '{}')
   const [animales, setAnimales] = useState<Animal[]>([])
   const [insumos, setInsumos] = useState<Insumo[]>([])
+  
 
   useEffect(() => {
     api
@@ -257,6 +260,9 @@ export default function Inicio() {
           </div>
         </div>
       </section>
+
+      {/* Resumen de producción */}
+      <ResumenProduccion />
 
       <p
         className="text-center text-3xl text-marron/80 pt-2"
