@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
+import ErrorPantalla from './components/ErrorPantalla'
 import Login from './pages/Login'
 import Registro from './pages/Registro'
 import Inicio from './pages/Inicio'
@@ -22,6 +23,16 @@ import MercadoBalance from './pages/MercadoBalance'
 import Usuarios from './pages/Usuarios'
 import Ubicacion from './pages/Ubicacion'
 import Perfil from './pages/Perfil'
+import Potreros from './pages/Potreros'
+import Lotes from './pages/Lotes'
+import Alimentacion from './pages/Alimentacion'
+import Pesos from './pages/Pesos'
+import { HubAnimales, HubUbicacion, HubInventario, HubAdministracion } from './pages/Menus'
+import LotesInventario from './pages/LotesInventario'
+import Nacimientos from './pages/Nacimientos'
+import Catalogos from './pages/Catalogos'
+import RecuperarContrasena from './pages/RecuperarContrasena'
+import Auditoria from './pages/Auditoria'
 import { puede } from './permisos'
 import type { Permiso } from './permisos'
 
@@ -42,83 +53,119 @@ function ConPermiso({
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/registro" element={<Registro />} />
-
-        <Route
-          element={
-            <Protegida>
-              <Layout />
-            </Protegida>
-          }
-        >
-          <Route path="/inicio" element={<Inicio />} />
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/ubicacion" element={<Ubicacion />} />
-
-          <Route path="/animales" element={<Animales />} />
-          <Route path="/animales/nuevo" element={<CrearAnimal />} />
-          <Route
-            path="/animales/:id/editar"
-            element={
-              <ConPermiso permiso="animales.editar">
-                <EditarAnimal />
-              </ConPermiso>
-            }
-          />
-          <Route path="/animales/:id" element={<AnimalDetalle />} />
-
-          <Route path="/produccion" element={<Produccion />} />
-          <Route path="/produccion/leche" element={<ProduccionLeche />} />
-          <Route path="/produccion/huevos" element={<ProduccionHuevos />} />
-          <Route path="/produccion/leche/nuevo" element={<RegistrarProduccion tipo="leche" />} />
-          <Route path="/produccion/huevos/nuevo" element={<RegistrarProduccion tipo="huevos" />} />
-
-          <Route path="/bodega" element={<Bodega />} />
-          <Route
-            path="/bodega/nuevo"
-            element={
-              <ConPermiso permiso="insumos.crear">
-                <CrearInsumo />
-              </ConPermiso>
-            }
-          />
-
-          <Route path="/salud" element={<EventosSanitarios />} />
-          <Route path="/salud/nuevo" element={<CrearEventoSanitario />} />
-
-          <Route path="/reproduccion" element={<Reproduccion />} />
-          <Route path="/reproduccion/nuevo" element={<CrearReproduccion />} />
+    <ErrorPantalla>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
+<Route path="/recuperar" element={<RecuperarContrasena />} />
 
           <Route
-            path="/finanzas"
             element={
-              <ConPermiso permiso="finanzas.ver">
-                <Finanzas />
-              </ConPermiso>
+              <Protegida>
+                <Layout />
+              </Protegida>
             }
-          />
-          <Route
-            path="/finanzas/balance"
-            element={
-              <ConPermiso permiso="finanzas.ver">
-                <MercadoBalance />
-              </ConPermiso>
-            }
-          />
+          >
+            <Route path="/inicio" element={<Inicio />} />
+            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/potreros" element={<Potreros />} />
+            <Route path="/lotes" element={<Lotes />} />
+            <Route path="/alimentacion" element={<Alimentacion />} />
+            <Route path="/pesos" element={<Pesos />} />
+<Route path="/ganado" element={<HubAnimales />} />
+<Route path="/nacimientos" element={<Nacimientos />} />
+<Route path="/inventario" element={<HubInventario />} />
+<Route path="/bodega/lotes" element={<LotesInventario />} />
+<Route
+  path="/catalogos"
+  element={
+    <ConPermiso permiso="catalogos.gestionar">
+      <Catalogos />
+    </ConPermiso>
+  }
+/>
+<Route path="/ubicaciones" element={<HubUbicacion />} />
+<Route
+  path="/administracion"
+  element={
+    <ConPermiso permiso="usuarios.ver">
+      <HubAdministracion />
+    </ConPermiso>
+  }
+/>
+            <Route
+              path="/auditoria"
+              element={
+                <ConPermiso permiso="auditoria.ver">
+                  <Auditoria />
+                </ConPermiso>
+              }
+            />
+            <Route path="/ubicacion" element={<Ubicacion />} />
 
-          <Route
-            path="/usuarios"
-            element={
-              <ConPermiso permiso="usuarios.ver">
-                <Usuarios />
-              </ConPermiso>
-            }
-          />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+            <Route path="/animales" element={<Animales />} />
+            <Route path="/animales/nuevo" element={<CrearAnimal />} />
+            <Route
+              path="/animales/:id/editar"
+              element={
+                <ConPermiso permiso="animales.editar">
+                  <EditarAnimal />
+                </ConPermiso>
+              }
+            />
+            <Route path="/animales/:id" element={<AnimalDetalle />} />
+
+            <Route path="/produccion" element={<Produccion />} />
+            <Route path="/produccion/leche" element={<ProduccionLeche />} />
+            <Route path="/produccion/huevos" element={<ProduccionHuevos />} />
+            <Route path="/produccion/leche/nuevo" element={<RegistrarProduccion tipo="leche" />} />
+            <Route path="/produccion/huevos/nuevo" element={<RegistrarProduccion tipo="huevos" />} />
+
+            <Route path="/bodega" element={<Bodega />} />
+            <Route
+              path="/bodega/nuevo"
+              element={
+                <ConPermiso permiso="insumos.crear">
+                  <CrearInsumo />
+                </ConPermiso>
+              }
+            />
+
+            <Route path="/salud" element={<EventosSanitarios />} />
+            <Route path="/salud/nuevo" element={<CrearEventoSanitario />} />
+
+            <Route path="/reproduccion" element={<Reproduccion />} />
+            <Route path="/reproduccion/nuevo" element={<CrearReproduccion />} />
+
+            <Route
+              path="/finanzas"
+              element={
+                <ConPermiso permiso="finanzas.ver">
+                  <Finanzas />
+                </ConPermiso>
+              }
+            />
+            <Route
+              path="/finanzas/balance"
+              element={
+                <ConPermiso permiso="finanzas.ver">
+                  <MercadoBalance />
+                </ConPermiso>
+              }
+            />
+
+            <Route
+              path="/usuarios"
+              element={
+                <ConPermiso permiso="usuarios.ver">
+                  <Usuarios />
+                </ConPermiso>
+              }
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ErrorPantalla>
   )
 }

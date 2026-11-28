@@ -18,6 +18,7 @@ export type Permiso =
   | 'usuarios.ver' // lista de usuarios (el backend solo la entrega al Administrador)
   | 'usuarios.gestionar' // crear, cambiar rol, activar/desactivar, restablecer contraseña
   | 'auditoria.ver' // registro de auditoría (solo Administrador en el backend)
+  | 'catalogos.gestionar' // especies, razas y categorías de bodega
   | 'ubicacion.editar' // cambiar la ubicación de la finca en el mapa
 
 // Qué roles tienen cada permiso (según la matriz y lo que permite el backend)
@@ -34,6 +35,7 @@ const PERMISOS: Record<Permiso, number[]> = {
   'usuarios.ver': [1],
   'usuarios.gestionar': [1],
   'auditoria.ver': [1],
+  'catalogos.gestionar': [1],
   'ubicacion.editar': [1, 2],
 }
 

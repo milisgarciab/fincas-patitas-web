@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LogOut, Mail, Phone, ShieldCheck, User } from 'lucide-react'
+import { api } from '../api'
 import { NOMBRE_ROL, rolActual } from '../permisos'
 import { limpiarSesion } from '../sesion'
 
@@ -15,7 +17,6 @@ const PERMISOS_ROL: Record<number, string[]> = {
   2: [
     'Operar el sistema día a día',
     'Editar y eliminar registros operativos',
-    'Crear Empleados y ver solo la lista de Empleados',
     'Consultar finanzas y configurar precios de mercado',
     'Trasladar animales entre potreros',
   ],
@@ -23,20 +24,66 @@ const PERMISOS_ROL: Record<number, string[]> = {
     'Registrar datos operativos: animales, producción, salud y reproducción',
     'Editar registros ya creados, sin poder eliminarlos',
     'Sin acceso a finanzas ni a la gestión de usuarios',
-    'Su contraseña solo la cambia un Administrador o un Encargado',
+    'Su contraseña solo la cambia un Administrador',
   ],
 }
+
+const campo =
+  'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-bosque/40'
 
 export default function Perfil() {
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('user') ?? '{}')
   const rolId = rolActual()
   const rol = NOMBRE_ROL[rolId] ?? 'Usuario'
-  const inicial = (user.nombre_usuario ?? '?').charAt(0).toUpperCase()
+
+  const [nombre, setNombre] = useState<string>(user.nombre_usuario ?? '')
+  const [clave, setClave] = useState('')
+  const [clave2, setClave2] = useState('')
+  const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState('')
+  const [aviso, setAviso] = useState('')
+
+  const inicial = (nombre || '?').charAt(0).toUpperCase()
 
   const salir = () => {
     limpiarSesion()
     navigate('/')
+  }
+
+  const guardar = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setAviso('')
+    if (clave && clave !== clave2) {
+      setError('Las contraseñas no coinciden.')
+      return
+    }
+    const cambios: Record<string, string> = {}
+    if (nombre.trim() && nombre.trim() !== user.nombre_usuario) cambios.nombre_usuario = nombre.trim()
+    if (clave) cambios.contrasena = clave
+    if (Object.keys(cambios).length === 0) {
+      setError('No hay cambios para guardar.')
+      return
+    }
+    setGuardando(true)
+    try {
+      await api.put(`/users/${user.id}/profile`, cambios)
+      if (cambios.nombre_usuario) {
+        localStorage.setItem('user', JSON.stringify({ ...user, nombre_usuario: cambios.nombre_usuario }))
+      }
+      setClave('')
+      setClave2('')
+      setAviso(
+        cambios.nombre_usuario
+          ? 'Datos actualizados. El nombre de la barra superior se refresca al recargar la página.'
+          : 'Contraseña actualizada.',
+      )
+    } catch (err: any) {
+      setError(err.response?.data?.error?.message ?? 'No se pudo actualizar el perfil')
+    } finally {
+      setGuardando(false)
+    }
   }
 
   const Fila = ({
@@ -69,7 +116,7 @@ export default function Perfil() {
             {inicial}
           </span>
           <div>
-            <p className="font-display font-bold text-xl text-marron">{user.nombre_usuario}</p>
+            <p className="font-display font-bold text-xl text-marron">{nombre}</p>
             <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-sm font-semibold bg-menta text-bosque-oscuro">
               {rol}
             </span>
@@ -80,6 +127,45 @@ export default function Perfil() {
         <Fila icono={Mail} etiqueta="Correo electrónico" valor={user.correo_electronico} />
         <Fila icono={Phone} etiqueta="Teléfono" valor={user.telefono} />
       </div>
+
+      <form onSubmit={guardar} className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+        <h2 className="font-display font-bold text-lg text-marron">Cambiar mis datos</h2>
+        <div>
+          <label className="block text-sm text-gray-600 mb-1">Nombre de usuario</label>
+          <input value={nombre} onChange={(e) => setNombre(e.target.value)} maxLength={100} className={campo} />
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Nueva contraseña (opcional)</label>
+            <input
+              type="password"
+              value={clave}
+              onChange={(e) => setClave(e.target.value)}
+              minLength={8}
+              className={campo}
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Repite la contraseña</label>
+            <input
+              type="password"
+              value={clave2}
+              onChange={(e) => setClave2(e.target.value)}
+              minLength={8}
+              className={campo}
+            />
+          </div>
+        </div>
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {aviso && <p className="text-bosque text-sm">{aviso}</p>}
+        <button
+          type="submit"
+          disabled={guardando}
+          className="bg-bosque hover:bg-bosque-oscuro text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-50"
+        >
+          {guardando ? 'Guardando...' : 'Guardar cambios'}
+        </button>
+      </form>
 
       <div className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="font-display font-bold text-lg text-marron mb-3 flex items-center gap-2">

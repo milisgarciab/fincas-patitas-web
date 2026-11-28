@@ -5,7 +5,7 @@ import { hoyLocal } from '../fechas'
 import SelectorAnimal from '../components/SelectorAnimal'
 
 // Solo "Vacunación" está confirmado en Swagger; los demás son suposición
-const TIPOS = ['Vacunación', 'Tratamiento', 'Enfermedad', 'Desparasitación']
+const TIPOS = ['Vacunación', 'Desparasitación', 'Tratamiento Médico', 'Cirugía', 'Chequeo General']
 
 export default function CrearEventoSanitario() {
   const navigate = useNavigate()

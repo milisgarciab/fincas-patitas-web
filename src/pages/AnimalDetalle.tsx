@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRightLeft, Pencil, Plus, Trash2 } from 'lucide-react'
 import { api } from '../api'
 import { obtenerLista } from '../produccionApi'
+import { aLista, cargarAnimales } from '../animalesLista'
+import type { AnimalResumen } from '../animalesLista'
 import { puede } from '../permisos'
 import Modal from '../components/Modal'
 
@@ -24,23 +26,25 @@ interface Animal {
   lotes_animales: { nombre: string } | null
 }
 
-interface Resumen {
-  id: number
-  codigo: string
-  nombre: string
-  genero: string
-  madre_id: number | null
-  padre_id: number | null
-}
-
-type Pestana = 'ficha' | 'salud' | 'reproduccion' | 'produccion' | 'ubicacion'
+type Pestana =
+  | 'ficha'
+  | 'salud'
+  | 'reproduccion'
+  | 'produccion'
+  | 'alimentacion'
+  | 'peso'
+  | 'ubicacion'
+  | 'historial'
 
 const PESTANAS: { id: Pestana; texto: string }[] = [
   { id: 'ficha', texto: 'Ficha' },
   { id: 'salud', texto: 'Salud' },
   { id: 'reproduccion', texto: 'Reproducción' },
   { id: 'produccion', texto: 'Producción' },
+  { id: 'alimentacion', texto: 'Alimentación' },
+  { id: 'peso', texto: 'Peso' },
   { id: 'ubicacion', texto: 'Ubicación' },
+  { id: 'historial', texto: 'Historial' },
 ]
 
 // Fecha solo-día en UTC para que no se corra un día
@@ -53,11 +57,7 @@ const campo =
   'w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-bosque/40'
 
 const lista = (r: PromiseSettledResult<{ data: any }>): any[] | null =>
-  r.status === 'fulfilled'
-    ? Array.isArray(r.value.data)
-      ? r.value.data
-      : (r.value.data?.data ?? [])
-    : null
+  r.status === 'fulfilled' ? aLista(r.value.data) : null
 
 function Fila({ etiqueta, valor }: { etiqueta: string; valor: React.ReactNode }) {
   return (
@@ -113,6 +113,19 @@ function Tabla({
   )
 }
 
+// Campos de un ítem de la línea de tiempo (la forma exacta no está en la documentación)
+const fechaItem = (x: any) =>
+  x.fecha ?? x.fecha_evento ?? x.registrado_en ?? x.fecha_inseminacion ?? x.creado_en ?? null
+const tipoItem = (x: any) => x.tipo ?? x.tipo_evento ?? x.categoria ?? x.evento ?? 'Registro'
+const detalleItem = (x: any) =>
+  x.descripcion ??
+  x.detalle ??
+  x.descripcion_tratamiento ??
+  (x.peso_kg != null ? `${Number(x.peso_kg)} kg` : null) ??
+  (x.litros != null ? `${Number(x.litros)} L` : null) ??
+  x.estado ??
+  '—'
+
 export default function AnimalDetalle() {
   const { id } = useParams()
   const idNum = Number(id)
@@ -122,12 +135,17 @@ export default function AnimalDetalle() {
 
   const [pestana, setPestana] = useState<Pestana>('ficha')
   const [animal, setAnimal] = useState<Animal | null>(null)
-  const [todos, setTodos] = useState<Resumen[] | null>(null)
+  const [todos, setTodos] = useState<AnimalResumen[] | null>(null)
+  const [potreros, setPotreros] = useState<any[] | null>(null)
   const [eventos, setEventos] = useState<any[] | null>(null)
   const [gestaciones, setGestaciones] = useState<any[] | null>(null)
   const [leche, setLeche] = useState<any[] | null>(null)
   const [huevos, setHuevos] = useState<any[] | null>(null)
+  const [pesos, setPesos] = useState<any[] | null>(null)
+  const [alimentos, setAlimentos] = useState<any[] | null>(null)
   const [movimientos, setMovimientos] = useState<any[] | null>(null)
+  const [descendencia, setDescendencia] = useState<any[] | null>(null)
+  const [linea, setLinea] = useState<any[] | null>(null)
 
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -135,21 +153,24 @@ export default function AnimalDetalle() {
 
   // Traslado
   const [trasladando, setTrasladando] = useState(false)
-  const [potreros, setPotreros] = useState<any[]>([])
   const [destino, setDestino] = useState('')
   const [errorTraslado, setErrorTraslado] = useState('')
   const [guardandoTraslado, setGuardandoTraslado] = useState(false)
 
   const cargar = useCallback(async () => {
-    const [a, todosR, ev, rep, le, hu, mov] = await Promise.allSettled([
+    const [a, todosR, pot, ev, rep, le, hu, pe, al, mov, des, his] = await Promise.allSettled([
       api.get(`/animales/${id}`),
-      api.get('/animales', { params: { pagina: 1, limite: 100 } }),
-      api.get('/eventos-sanitarios'),
+      cargarAnimales(),
+      api.get('/ubicaciones-potreros'),
+      api.get('/eventos-sanitarios', { params: { animal_id: id } }),
       api.get('/reproduccion'),
       obtenerLista<any>(['/produccion-leche']),
-      obtenerLista<any>(['/produccion-huevos', '/produccion/huevos']),
+      obtenerLista<any>(['/produccion-huevos']),
+      api.get('/registros-peso', { params: { animal_id: id } }),
+      api.get('/alimentacion', { params: { animal_id: id } }),
       api.get(`/animales/${id}/movimientos`),
-      api.get('/ubicaciones-potreros')
+      api.get(`/nacimientos/${id}/descendencia`),
+      api.get(`/animales/${id}/historial`),
     ])
 
     if (a.status === 'fulfilled') {
@@ -163,24 +184,23 @@ export default function AnimalDetalle() {
       )
     }
 
-    setTodos(lista(todosR))
-    setEventos(lista(ev)?.filter((e) => e.animal_id === idNum) ?? null)
+    setTodos(todosR.status === 'fulfilled' ? todosR.value : null)
+    setPotreros(lista(pot))
+    setEventos(lista(ev)?.filter((e) => !e.eliminado_en) ?? null)
     setGestaciones(
-      lista(rep)?.filter(
-        (g) => !g.eliminado_en && (g.animal_id === idNum || g.macho_id === idNum),
-      ) ?? null,
+      lista(rep)?.filter((g) => !g.eliminado_en && (g.animal_id === idNum || g.macho_id === idNum)) ??
+        null,
     )
-    setLeche(
-      le.status === 'fulfilled'
-        ? le.value.filter((r: any) => !r.eliminado_en && (r.animal_id === idNum || r.animales?.id === idNum))
-        : null,
-    )
-    setHuevos(
-      hu.status === 'fulfilled'
-        ? hu.value.filter((r: any) => !r.eliminado_en && (r.animal_id === idNum || r.animales?.id === idNum))
-        : null,
-    )
+    const delAnimal = (r: any) => !r.eliminado_en && (r.animal_id === idNum || r.animales?.id === idNum)
+    setLeche(le.status === 'fulfilled' ? le.value.filter(delAnimal) : null)
+    setHuevos(hu.status === 'fulfilled' ? hu.value.filter(delAnimal) : null)
+    setPesos(lista(pe))
+    setAlimentos(lista(al))
     setMovimientos(lista(mov))
+    setDescendencia(lista(des))
+    setLinea(
+      his.status === 'fulfilled' ? (his.value.data?.historial?.lineaDeTiempo ?? []) : null,
+    )
   }, [id, idNum])
 
   useEffect(() => {
@@ -208,10 +228,6 @@ export default function AnimalDetalle() {
     setDestino('')
     setErrorTraslado('')
     setTrasladando(true)
-    api
-      .get('/potreros')
-      .then((r) => setPotreros(Array.isArray(r.data) ? r.data : (r.data?.data ?? [])))
-      .catch(() => setErrorTraslado('No se pudo cargar la lista de potreros.'))
   }
 
   const trasladar = async (e: React.FormEvent) => {
@@ -233,7 +249,7 @@ export default function AnimalDetalle() {
   const nombreDe = (animalId: number | null) => {
     if (!animalId) return '—'
     const a = todos?.find((x) => x.id === animalId)
-    return a ? `${a.nombre} (${a.codigo})` : `Animal #${animalId}`
+    return a ? `${a.nombre ?? 'Sin nombre'} (${a.codigo})` : `Animal #${animalId}`
   }
 
   const enlaceAnimal = (animalId: number | null) =>
@@ -245,25 +261,37 @@ export default function AnimalDetalle() {
       '—'
     )
 
-  const crias = todos?.filter((x) => x.madre_id === idNum || x.padre_id === idNum) ?? null
+  const nombrePotrero = (potreroId: number | null | undefined) => {
+    if (!potreroId) return null
+    return potreros?.find((p) => p.id === potreroId)?.nombre ?? `Potrero #${potreroId}`
+  }
+
+  // Crías: ruta propia; si falla, se deducen de la lista de animales
+  const crias: any[] | null =
+    descendencia ?? todos?.filter((x) => x.madre_id === idNum || x.padre_id === idNum) ?? null
   const nacidoPorReproduccion = !!animal?.madre_id && /^nacid/i.test(animal?.origen ?? '')
 
-  const nombrePotrero = (m: any, claves: string[], idClaves: string[]) => {
-    for (const c of claves) if (m?.[c]?.nombre) return m[c].nombre as string
-    for (const c of idClaves) if (m?.[c]) return `Potrero #${m[c]}`
-    return null
-  }
-  const textoMovimiento = (m: any) => {
-    const origen =
-      nombrePotrero(m, ['potrero_origen', 'origen'], ['potrero_origen_id']) ?? 'Sin ubicación'
-    const dest =
-      nombrePotrero(
-        m,
-        ['potrero_destino', 'destino', 'ubicaciones_potreros'],
-        ['potrero_destino_id', 'potrero_id'],
-      ) ?? '—'
-    return `${origen} → ${dest}`
-  }
+  // Peso con el cambio frente al registro anterior
+  const pesosOrdenados = [...(pesos ?? [])].sort((a, b) =>
+    String(a.registrado_en).localeCompare(String(b.registrado_en)),
+  )
+  const filasPeso = pesosOrdenados
+    .map((r, i) => {
+      const cambio = i === 0 ? null : Number(r.peso_kg) - Number(pesosOrdenados[i - 1].peso_kg)
+      return [
+        fechaHora(r.registrado_en),
+        `${Number(r.peso_kg)} kg`,
+        cambio === null ? (
+          '—'
+        ) : (
+          <span className={cambio < 0 ? 'text-red-600' : 'text-bosque'}>
+            {cambio > 0 ? '+' : ''}
+            {cambio.toFixed(2)} kg
+          </span>
+        ),
+      ]
+    })
+    .reverse()
 
   const sinDatos = (v: unknown) => v === null
   const aviso = (texto: string) => <p className="text-sm text-gray-500">{texto}</p>
@@ -296,7 +324,8 @@ export default function AnimalDetalle() {
               <div>
                 <h1 className="text-2xl font-bold text-marron">{animal.nombre}</h1>
                 <p className="font-mono text-sm text-gray-500">
-                  {animal.codigo} · {animal.especies?.nombre} {animal.razas ? `· ${animal.razas.nombre}` : ''}
+                  {animal.codigo} · {animal.especies?.nombre}{' '}
+                  {animal.razas ? `· ${animal.razas.nombre}` : ''}
                 </p>
               </div>
               <span
@@ -384,8 +413,12 @@ export default function AnimalDetalle() {
                   aviso('No se pudieron cargar las crías.')
                 ) : (
                   <Tabla
-                    columnas={['Animal', 'Género']}
-                    filas={crias!.map((c) => [enlaceAnimal(c.id), c.genero])}
+                    columnas={['Animal', 'Género', 'Nacimiento']}
+                    filas={crias!.map((c) => [
+                      enlaceAnimal(c.id),
+                      c.genero,
+                      fechaDia(c.fecha_nacimiento),
+                    ])}
                     vacio="Este animal no tiene crías registradas"
                   />
                 )}
@@ -402,11 +435,13 @@ export default function AnimalDetalle() {
                 <Tabla
                   columnas={['Fecha', 'Tipo', 'Dosis', 'Tratamiento', 'Estado']}
                   filas={[...eventos!]
-                    .sort((a, b) => b.fecha_evento.localeCompare(a.fecha_evento))
+                    .sort((a, b) => String(b.fecha_evento).localeCompare(String(a.fecha_evento)))
                     .map((e) => [
                       fechaDia(e.fecha_evento),
                       e.tipo_evento,
-                      e.dosis_aplicada ?? '—',
+                      e.dosis_aplicada != null
+                        ? `${Number(e.dosis_aplicada)} ${e.unidad_dosis ?? ''}`.trim()
+                        : '—',
                       e.descripcion_tratamiento ?? '—',
                       e.estado,
                     ])}
@@ -438,7 +473,7 @@ export default function AnimalDetalle() {
                       return [
                         esHembra ? 'Hembra' : 'Macho',
                         enlaceAnimal(esHembra ? g.macho_id : g.animal_id),
-                        g.tipo,
+                        g.tipo ?? '—',
                         fechaDia(g.fecha_inseminacion),
                         fechaDia(g.fecha_estimada_parto),
                         g.estado,
@@ -461,11 +496,11 @@ export default function AnimalDetalle() {
                   <Tabla
                     columnas={['Fecha', 'Litros', 'Jornada', 'Observaciones']}
                     filas={[...leche!]
-                      .sort((a, b) => b.registrado_en.localeCompare(a.registrado_en))
+                      .sort((a, b) => String(b.registrado_en).localeCompare(String(a.registrado_en)))
                       .map((r) => [
                         fechaHora(r.registrado_en),
                         `${Number(r.litros)} L`,
-                        r.jornada,
+                        r.jornada ?? '—',
                         r.observaciones ?? '—',
                       ])}
                     vacio="Sin registros de leche para este animal"
@@ -480,17 +515,67 @@ export default function AnimalDetalle() {
                   <Tabla
                     columnas={['Fecha', 'Cantidad', 'Rotos', 'Observaciones']}
                     filas={[...huevos!]
-                      .sort((a, b) => b.registrado_en.localeCompare(a.registrado_en))
+                      .sort((a, b) => String(b.registrado_en).localeCompare(String(a.registrado_en)))
                       .map((r) => [
                         fechaHora(r.registrado_en),
                         r.cantidad,
-                        r.cantidad_rotos,
+                        r.cantidad_rotos ?? 0,
                         r.observaciones ?? '—',
                       ])}
                     vacio="Sin registros de huevos para este animal"
                   />
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Alimentación */}
+          {pestana === 'alimentacion' && (
+            <div className="space-y-3">
+              {sinDatos(alimentos) ? (
+                aviso('No se pudo cargar la alimentación del animal.')
+              ) : (
+                <Tabla
+                  columnas={['Fecha', 'Alimento', 'Cantidad']}
+                  filas={[...alimentos!]
+                    .sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)))
+                    .map((r) => [
+                      fechaDia(r.fecha),
+                      r.tipo_alimento,
+                      `${Number(r.cantidad)} ${r.unidad}`,
+                    ])}
+                  vacio="Este animal no tiene registros de alimentación"
+                />
+              )}
+              <Link
+                to={`/alimentacion?animal=${animal.id}&nuevo=1`}
+                className="inline-flex items-center gap-1 text-bosque font-semibold hover:underline"
+              >
+                <Plus className="w-4 h-4" />
+                Registrar alimentación
+              </Link>
+            </div>
+          )}
+
+          {/* Peso */}
+          {pestana === 'peso' && (
+            <div className="space-y-3">
+              {sinDatos(pesos) ? (
+                aviso('No se pudo cargar el peso del animal.')
+              ) : (
+                <Tabla
+                  columnas={['Fecha', 'Peso', 'Cambio']}
+                  filas={filasPeso}
+                  vacio="Este animal no tiene registros de peso"
+                />
+              )}
+              <Link
+                to={`/pesos?animal=${animal.id}&nuevo=1`}
+                className="inline-flex items-center gap-1 text-bosque font-semibold hover:underline"
+              >
+                <Plus className="w-4 h-4" />
+                Registrar peso
+              </Link>
             </div>
           )}
 
@@ -512,11 +597,11 @@ export default function AnimalDetalle() {
                 </div>
                 <Fila
                   etiqueta="Potrero"
-                  valor={animal.potrero_id ? `Potrero #${animal.potrero_id}` : 'Sin potrero asignado'}
+                  valor={nombrePotrero(animal.potrero_id) ?? 'Sin potrero asignado'}
                 />
                 <Fila etiqueta="Lote" valor={animal.lotes_animales?.nombre ?? 'Sin lote'} />
                 <p className="text-xs text-gray-500 mt-3">
-                  La ubicación solo cambia con un traslado, para que quede registrado el movimiento.
+                  El potrero solo cambia con un traslado, para que quede registrado el movimiento.
                 </p>
               </div>
 
@@ -528,15 +613,38 @@ export default function AnimalDetalle() {
                   aviso('No se pudo cargar el historial de movimientos.')
                 ) : (
                   <Tabla
-                    columnas={['Fecha', 'Movimiento']}
-                    filas={[...movimientos!].reverse().map((m) => [
-                      fechaHora(m.fecha_movimiento ?? m.fecha ?? m.creado_en),
-                      textoMovimiento(m),
-                    ])}
+                    columnas={['Fecha', 'Desde', 'Hacia']}
+                    filas={[...movimientos!]
+                      .sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)))
+                      .map((m) => [
+                        fechaHora(m.fecha),
+                        nombrePotrero(m.potrero_origen_id) ?? 'Sin ubicación',
+                        nombrePotrero(m.potrero_destino_id) ?? '—',
+                      ])}
                     vacio="Este animal todavía no tiene traslados"
                   />
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Historial unificado */}
+          {pestana === 'historial' && (
+            <div>
+              <p className="text-sm text-gray-500 mb-2">
+                Línea de tiempo con salud, producción, peso y gestaciones.
+              </p>
+              {sinDatos(linea) ? (
+                aviso('No se pudo cargar el historial del animal.')
+              ) : (
+                <Tabla
+                  columnas={['Fecha', 'Tipo', 'Detalle']}
+                  filas={[...linea!]
+                    .sort((a, b) => String(fechaItem(b)).localeCompare(String(fechaItem(a))))
+                    .map((x) => [fechaHora(fechaItem(x)), tipoItem(x), detalleItem(x)])}
+                  vacio="Este animal todavía no tiene historial"
+                />
+              )}
             </div>
           )}
         </>
@@ -558,7 +666,7 @@ export default function AnimalDetalle() {
                 className={campo}
               >
                 <option value="">Selecciona un potrero</option>
-                {potreros
+                {(potreros ?? [])
                   .filter((p) => p.id !== animal?.potrero_id)
                   .map((p) => (
                     <option key={p.id} value={p.id}>
@@ -567,6 +675,9 @@ export default function AnimalDetalle() {
                     </option>
                   ))}
               </select>
+              {potreros === null && (
+                <p className="text-sm text-red-600 mt-1">No se pudo cargar la lista de potreros.</p>
+              )}
             </div>
 
             {errorTraslado && <p className="text-red-600 text-sm">{errorTraslado}</p>}
