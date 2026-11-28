@@ -27,7 +27,11 @@ import Potreros from './pages/Potreros'
 import Lotes from './pages/Lotes'
 import Alimentacion from './pages/Alimentacion'
 import Pesos from './pages/Pesos'
-import { HubAnimales, HubUbicacion, HubAdministracion } from './pages/Menus'
+import { HubAnimales, HubUbicacion, HubInventario, HubAdministracion } from './pages/Menus'
+import LotesInventario from './pages/LotesInventario'
+import Nacimientos from './pages/Nacimientos'
+import Catalogos from './pages/Catalogos'
+import RecuperarContrasena from './pages/RecuperarContrasena'
 import Auditoria from './pages/Auditoria'
 import { puede } from './permisos'
 import type { Permiso } from './permisos'
@@ -54,6 +58,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
+<Route path="/recuperar" element={<RecuperarContrasena />} />
 
           <Route
             element={
@@ -69,6 +74,17 @@ export default function App() {
             <Route path="/alimentacion" element={<Alimentacion />} />
             <Route path="/pesos" element={<Pesos />} />
 <Route path="/ganado" element={<HubAnimales />} />
+<Route path="/nacimientos" element={<Nacimientos />} />
+<Route path="/inventario" element={<HubInventario />} />
+<Route path="/bodega/lotes" element={<LotesInventario />} />
+<Route
+  path="/catalogos"
+  element={
+    <ConPermiso permiso="catalogos.gestionar">
+      <Catalogos />
+    </ConPermiso>
+  }
+/>
 <Route path="/ubicaciones" element={<HubUbicacion />} />
 <Route
   path="/administracion"

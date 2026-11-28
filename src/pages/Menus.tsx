@@ -1,4 +1,17 @@
-import { ClipboardList, Layers, MapPin, PawPrint, Scale, Trees, Users, Wheat } from 'lucide-react'
+import {
+  CalendarClock,
+  ClipboardList,
+  Layers,
+  MapPin,
+  Package,
+  PawPrint,
+  Scale,
+  Sprout,
+  Tags,
+  Trees,
+  Users,
+  Wheat,
+} from 'lucide-react'
 import Hub from '../components/Hub'
 
 export function HubAnimales() {
@@ -12,6 +25,12 @@ export function HubAnimales() {
           descripcion: 'Fichas, búsqueda y registro de animales',
           ruta: '/animales',
           icono: PawPrint,
+        },
+        {
+          titulo: 'Nacimientos',
+          descripcion: 'Crías nacidas en la finca y sus padres',
+          ruta: '/nacimientos',
+          icono: Sprout,
         },
         {
           titulo: 'Alimentación',
@@ -59,11 +78,34 @@ export function HubUbicacion() {
   )
 }
 
+export function HubInventario() {
+  return (
+    <Hub
+      titulo="Inventario"
+      subtitulo="Elige qué quieres revisar o registrar."
+      tarjetas={[
+        {
+          titulo: 'Insumos',
+          descripcion: 'Stock, entradas y salidas',
+          ruta: '/bodega',
+          icono: Package,
+        },
+        {
+          titulo: 'Vencimientos',
+          descripcion: 'Lotes de inventario y fechas de vencimiento',
+          ruta: '/bodega/lotes',
+          icono: CalendarClock,
+        },
+      ]}
+    />
+  )
+}
+
 export function HubAdministracion() {
   return (
     <Hub
       titulo="Administración"
-      subtitulo="Control de personas y de la actividad del sistema."
+      subtitulo="Control de personas, catálogos y actividad del sistema."
       tarjetas={[
         {
           titulo: 'Usuarios',
@@ -71,6 +113,13 @@ export function HubAdministracion() {
           ruta: '/usuarios',
           icono: Users,
           permiso: 'usuarios.ver',
+        },
+        {
+          titulo: 'Catálogos',
+          descripcion: 'Especies, razas y categorías de bodega',
+          ruta: '/catalogos',
+          icono: Tags,
+          permiso: 'catalogos.gestionar',
         },
         {
           titulo: 'Auditoría',

@@ -49,7 +49,7 @@ const MENU: Opcion[] = [
     ruta: '/ubicaciones',
     rutas: ['/ubicaciones', '/ubicacion', '/potreros', '/lotes'],
   },
-  { texto: 'Inventario', icono: Package, ruta: '/bodega', rutas: ['/bodega'] },
+  { texto: 'Inventario', icono: Package, ruta: '/inventario', rutas: ['/inventario', '/bodega'] },
   { texto: 'Salud', icono: HeartPulse, ruta: '/salud', rutas: ['/salud'] },
   { texto: 'Reproducción', icono: Baby, ruta: '/reproduccion', rutas: ['/reproduccion'] },
   {
