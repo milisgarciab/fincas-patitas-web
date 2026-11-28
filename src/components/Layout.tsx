@@ -1,26 +1,20 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   Baby,
   ChevronDown,
-  ChevronUp,
   HeartPulse,
-  Home,
-  LogOut,
+   Home,
   MapPin,
+  LogOut,
   Menu,
   Milk,
   Package,
   PawPrint,
   Search,
+  Settings,
   User,
-  ClipboardList,
-  Users,
-  Layers,
-  Scale,
-  Trees,
   Wallet,
-  Wheat,
   X,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -29,43 +23,49 @@ import type { Permiso } from '../permisos'
 import { limpiarSesion } from '../sesion'
 import ToggleTema from './ToggleTema'
 import Notificaciones from './Notificaciones'
-
-interface Item {
-  texto: string
-  ruta: string
-}
+import ErrorPantalla from './ErrorPantalla'
 
 interface Opcion {
   texto: string
   icono: LucideIcon
-  ruta?: string
-  exacta?: boolean
-  hijos?: Item[]
+  ruta: string
+  // Pantallas que mantienen resaltado este botón
+  rutas: string[]
   permiso?: Permiso
 }
 
 const MENU: Opcion[] = [
-  { texto: 'Inicio', icono: Home, ruta: '/inicio', exacta: true },
-  { texto: 'Animales', icono: PawPrint, ruta: '/animales' },
+  { texto: 'Inicio', icono: Home, ruta: '/inicio', rutas: ['/inicio'] },
   {
-    texto: 'Producción',
-    icono: Milk,
-    hijos: [
-      { texto: 'Leche', ruta: '/produccion/leche' },
-      { texto: 'Huevos', ruta: '/produccion/huevos' },
-    ],
+    texto: 'Animales',
+    icono: PawPrint,
+    ruta: '/ganado',
+    rutas: ['/ganado', '/animales', '/alimentacion', '/pesos'],
   },
-  { texto: 'Inventario', icono: Package, ruta: '/bodega' },
-  { texto: 'Salud', icono: HeartPulse, ruta: '/salud' },
-  { texto: 'Reproducción', icono: Baby, ruta: '/reproduccion' },
-  { texto: 'Ubicación', icono: MapPin, ruta: '/ubicacion' },
-  { texto: 'Potreros', icono: Trees, ruta: '/potreros' },
-  { texto: 'Lotes', icono: Layers, ruta: '/lotes' },
-  { texto: 'Alimentación', icono: Wheat, ruta: '/alimentacion' },
-  { texto: 'Peso', icono: Scale, ruta: '/pesos' },
-  { texto: 'Finanzas', icono: Wallet, ruta: '/finanzas', permiso: 'finanzas.ver' },
-  { texto: 'Usuarios', icono: Users, ruta: '/usuarios', permiso: 'usuarios.ver' },
-  { texto: 'Auditoría', icono: ClipboardList, ruta: '/auditoria', permiso: 'auditoria.ver' },
+  { texto: 'Producción', icono: Milk, ruta: '/produccion', rutas: ['/produccion'] },
+  {
+    texto: 'Ubicación',
+    icono: MapPin,
+    ruta: '/ubicaciones',
+    rutas: ['/ubicaciones', '/ubicacion', '/potreros', '/lotes'],
+  },
+  { texto: 'Inventario', icono: Package, ruta: '/bodega', rutas: ['/bodega'] },
+  { texto: 'Salud', icono: HeartPulse, ruta: '/salud', rutas: ['/salud'] },
+  { texto: 'Reproducción', icono: Baby, ruta: '/reproduccion', rutas: ['/reproduccion'] },
+  {
+    texto: 'Finanzas',
+    icono: Wallet,
+    ruta: '/finanzas',
+    rutas: ['/finanzas'],
+    permiso: 'finanzas.ver',
+  },
+  {
+    texto: 'Administración',
+    icono: Settings,
+    ruta: '/administracion',
+    rutas: ['/administracion', '/usuarios', '/auditoria'],
+    permiso: 'usuarios.ver',
+  },
 ]
 
 export default function Layout() {
@@ -78,16 +78,15 @@ export default function Layout() {
 
   const [menuMovil, setMenuMovil] = useState(false)
   const [menuUsuario, setMenuUsuario] = useState(false)
-  const [produccionAbierta, setProduccionAbierta] = useState(
-    location.pathname.startsWith('/produccion'),
-  )
   const [busqueda, setBusqueda] = useState('')
 
   useEffect(() => {
     setMenuMovil(false)
     setMenuUsuario(false)
-    if (location.pathname.startsWith('/produccion')) setProduccionAbierta(true)
   }, [location.pathname])
+
+  const estaActivo = (m: Opcion) =>
+    m.rutas.some((r) => location.pathname === r || location.pathname.startsWith(`${r}/`))
 
   const salir = () => {
     limpiarSesion()
@@ -123,60 +122,11 @@ export default function Layout() {
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         {menu.map((m) => {
           const Icono = m.icono
-
-          if (m.ruta) {
-            return (
-              <NavLink
-                key={m.texto}
-                to={m.ruta}
-                end={m.exacta}
-                className={({ isActive }) => claseItem(isActive)}
-              >
-                <Icono className="w-5 h-5" />
-                {m.texto}
-              </NavLink>
-            )
-          }
-
-          const activo = location.pathname.startsWith('/produccion')
           return (
-            <div key={m.texto}>
-              <button
-                onClick={() => {
-                  setProduccionAbierta(true)
-                  navigate('/produccion')
-                }}
-                className={`w-full ${claseItem(activo && !produccionAbierta)}`}
-              >
-                <Icono className="w-5 h-5" />
-                <span className="flex-1 text-left">{m.texto}</span>
-                {produccionAbierta ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                )}
-              </button>
-
-              {produccionAbierta && (
-                <div className="mt-1 ml-5 pl-4 border-l border-marron/15 space-y-1">
-                  {m.hijos!.map((h) => (
-                    <NavLink
-                      key={h.ruta}
-                      to={h.ruta}
-                      className={({ isActive }) =>
-                        `block px-3 py-2 rounded-lg text-sm font-semibold ${
-                          isActive
-                            ? 'bg-menta text-bosque-oscuro'
-                            : 'text-marron/75 hover:bg-menta'
-                        }`
-                      }
-                    >
-                      {h.texto}
-                    </NavLink>
-                  ))}
-                </div>
-              )}
-            </div>
+            <Link key={m.texto} to={m.ruta} className={claseItem(estaActivo(m))}>
+              <Icono className="w-5 h-5" />
+              {m.texto}
+            </Link>
           )
         })}
       </nav>
@@ -267,7 +217,9 @@ export default function Layout() {
         </header>
 
         <main className="[&>div]:min-h-[calc(100vh-4rem)]">
-          <Outlet />
+          <ErrorPantalla key={location.pathname}>
+            <Outlet />
+          </ErrorPantalla>
         </main>
       </div>
     </div>
